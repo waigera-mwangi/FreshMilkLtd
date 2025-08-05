@@ -1,0 +1,57 @@
+{% extends 'layouts/base-auth.html' %}
+
+{% load static %}
+{% load humanize %}
+{% load widget_tweaks %}
+{% block content %}
+{% load static %}
+{% block styles %}
+{% block title %}{% endblock title %}
+
+{% endblock styles %}
+
+<div class="container-fluid mt-3">
+
+    <h2 style = "text-align:center;">About Us</h2>
+
+    <p class="about-text">We are Wood dealers.</p>
+    <div class="location-info">
+        <p class="location-address">We are Located at;</p>
+        <p class="centered-note">
+            Staware Exhibition, Opposite Post Office,<br>
+            Ronald Ngala Street, Eldoret, Kenya.<br>
+            +254714966780<br>
+            sales@truckcityltd.co.ke<br>
+            www.truckcityltdtemplates/driver/includes/about-us.html.co.ke
+        </p>
+    </div>
+
+</div>
+
+<style>
+    /* General styles */
+    p {
+        font-size: 18px;
+        line-height: 1.5;
+        margin: 10px 0;
+    }
+
+    .centered-note {
+        text-align: center;
+        font-size: 20px;
+        font-style: italic;
+        color: #ff0000; /* Red color for warning */
+    }
+
+    /* Responsive styles for mobile web view */
+    @media (max-width: 576px) {
+        p {
+            font-size: 16px;
+        }
+
+        .centered-note {
+            font-size: 18px;
+        }
+    }
+</style>
+{% endblock content %}

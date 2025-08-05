@@ -1,0 +1,57 @@
+<!-- search_results.html -->
+{% extends 'customer/layouts/customer-base.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <h1>Search Results for "{{ query }}"</h1>
+
+    {% if product_results or service_results %}
+        <h2>Products</h2>
+        {% if product_results %}
+            <div class="row">
+                {% for product in product_results %}
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description }}</p>
+                                <p class="card-text">{{ product.price }}</p>
+                                <div style="padding: 5px;">
+                                    <a href="{% url 'store:add_to_cart' product.pk %}" class="btn btn-primary btn-sm btn-block" style="font-size: 0.8rem;">Add to cart</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No products found.</p>
+        {% endif %}
+
+        <h2>Services</h2>
+        {% if service_results %}
+            <div class="row">
+                {% for service in service_results %}
+                    <div class="col-md-4">
+                        <div class="card mb-3">
+                            <img class="card-img-top" src="{{ service.image.url }}" alt="{{ service.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ service.name }}</h5>
+                                <p class="card-text">{{ service.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No services found.</p>
+        {% endif %}
+    {% else %}
+        <p>No results found for "{{ query }}".</p>
+    {% endif %}
+</div>
+{% endblock %}

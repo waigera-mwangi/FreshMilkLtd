@@ -1,0 +1,24 @@
+{% extends 'service_provider/layouts/service-base.html' %}
+
+{% block title %}Rejected Orders{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center">Rejected Orders</h1>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      {% for shipping in rejected_orders %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="card-text"><strong>Order ID:</strong> {{ shipping.order.id }}</p>
+          <p class="card-text"><strong>Customer:</strong> {{ shipping.order.user.username }}</p>
+          <p class="card-text"><strong>Rejection Reason:</strong> {{ shipping.rejection_message }}</p>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-center">No rejected orders found.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

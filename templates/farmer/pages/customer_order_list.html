@@ -1,0 +1,88 @@
+{% extends 'customer/layouts/customer-base.html' %}
+
+{% block content %}
+  <div class="container-fluid mt-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+     {% for order in order_list %}
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Order unique id: {{ order.transaction_id }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ order.date_ordered|date:"F d, Y" }}</h6>
+        <p class="card-text">Items ordered: {{ order.quantity }}</p>
+       
+        <p class="card-text">Status: {{ order.payment_status }}</p>
+        <a href="{% url 'store:customer-order-details' order.order_id %}" class="btn btn-primary btn-sm">View Details</a>
+        {% if order.cart_id and order.cart_id %}
+          <a href="#" class="btn btn-secondary btn-sm">Download PDF</a><br>
+        {% endif %}
+        <div style="padding-top: 5px;">
+          <a href="{% url 'shipping:track_shipping' order_id=order.order_id %}" class="btn btn-info btn-sm">Track Delivery</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% empty %}
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <p>No orders found.</p>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+    </div>
+  </div>
+
+  <style>
+    /* Styles for the cards */
+    .card {
+      border: none;
+      border-radius: 10px;
+      background-color: #f7f7f7;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      color: #2979FF;
+    }
+
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .card-text {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Styles for mobile devices */
+    @media (max-width: 768px) {
+      .card {
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 1rem;
+      }
+
+      .card-subtitle {
+        font-size: 0.8rem;
+      }
+
+      .card-text {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+
+{% endblock %}

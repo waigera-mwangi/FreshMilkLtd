@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Service Receipt</title>
+  <style>
+    /* Style the page layout */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      max-height: 50px;
+    }
+    .title {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .subtitle {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .details {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .details th,
+    .details td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .total {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: right;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">
+      <img src="{% static 'assets/img/avatars/1.png' %}" alt="Company Logo">
+    </div>
+    <div>
+      <p>TRUCK CITY LIMITED<br>
+        Service Receipt<br>
+        Phone: +254714966780,<br>
+        Email: sales@truckcityltd.co.ke, <br>
+        Opposite Post Office, Eldoret,  Kenya.
+      </p>
+    </div>
+  </div>
+  <div class="subtitle">
+    Booking Details - {{ booking.user.get_full_name }}
+  </div>
+  <table class="details">
+    <thead>
+    <tr>
+      <th>Service</th>
+      <th>Booking Date</th>
+      <th>Service Cost</th>
+    </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ booking.service.name }}</td>
+        <td>{{ booking.booking_date }}</td>
+        <td>KES{{ booking.service.name.price }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="total">
+    Total Paid: {{ booking.service.name.price }}
+  </div>
+</div>
+</body>
+</html>

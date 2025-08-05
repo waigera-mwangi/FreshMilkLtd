@@ -1,0 +1,19 @@
+{% extends 'service_provider/layouts/service-base.html' %}
+
+{% block title %}Provide Tools{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="text-center">Provide Tools</h1>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><strong>Tools Required:</strong> {{ tools_required }}</p>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

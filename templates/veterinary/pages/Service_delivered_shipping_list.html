@@ -1,0 +1,40 @@
+{% extends 'service_provider/layouts/service-base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="my-4">Delivered Order List</h1>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+  <thead class="thead-light">
+    <tr>
+      <th>Order Id</th>
+      <th>County</th>
+      <th>Town</th>
+      <th>Phone</th>
+      <th>Delivery Date</th>
+      <th>Status</th>
+       <!-- Add new column for action button -->
+    </tr>
+  </thead>
+  <tbody>
+    {% for shipping in shipping_list %}
+      <tr>
+        <td>{{ shipping.order.orderpayment.transaction_id }}</td>
+        <td>{{ shipping.order.orderpayment.county }}</td>
+        <td>{{ shipping.order.orderpayment.town }}</td>
+        <td>{{ shipping.order.orderpayment.phone_number }}</td>
+        <td>{{ shipping.delivery_date }}</td>
+        <td>{{ shipping.get_status_display }}</td>
+       
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5">No shipments found.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+    </div>
+  </div>
+{% endblock %}

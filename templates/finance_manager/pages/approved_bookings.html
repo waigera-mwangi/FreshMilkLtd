@@ -1,0 +1,47 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+
+{% block content %}
+  <div class="container-fluid my-5">
+    <div class="card mb-5">
+      <div class="card-header" style="background-color: #1c2238;">
+        <h1 class="text-center mb-0 text-white">Approved Booking Payments</h1>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-striped">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Transaction ID</th>
+                <th scope="col">Username</th>
+                <th scope="col">Service</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Payment Status</th>
+                <th scope="col">Date</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+
+              {% for booking in bookings %}
+    <tr>
+        <th scope="row">{{ booking.bookingpayment.transaction_id }}</th>
+        <td>{{ booking.user.username }}</td>
+        <td>{{ booking.service }}</td>
+        <td>{{ booking.service.name.price }}</td>
+        <td>{{ booking.bookingpayment.payment_status }}</td>
+        <td>{{ booking.booking_date }}</td>
+          </tr>
+      {% empty %}
+          <tr>
+              <td colspan="6" class="text-center">No approved service bookings found.</td>
+          </tr>
+      {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

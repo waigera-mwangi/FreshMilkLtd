@@ -1,0 +1,96 @@
+
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link " href="{% url 'store:view-product' %}">
+        <i class="bi bi-grid"></i>
+        <span>Home</span>
+      </a>
+    </li>
+    <!-- End Dashboard Nav -->
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-shop"></i><span>Categories</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+    
+      <ul id="tables-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        {% for category in categories %}
+        <li>
+          <a class="bi bi-circle" href="{% url 'store:product_by_category' category.slug %}">{{ category.name|title }}</a>
+          
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    
+    <!-- End Categories Nav -->
+      
+    <li class="nav-item">
+      <a class="nav-link " href="{% url 'store:customer-order-list' %}">
+        <i class="fa fa-truck"></i>
+        <span>My Orders</span>
+      </a>
+    </li><!-- End Orders-->
+
+      <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+         <i class="fas fa-edit"></i><span>Services</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+
+      <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        
+        <li>
+          <a href="{% url 'brands:branding' %}">
+           <i class="bi bi-receipt" style="font-size: large"></i><span>Book service</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'brands:view_brands' %}">
+           <i class="bi bi-receipt" style="font-size: large"></i><span>Booked service</span>
+          </a>
+        </li>
+      </ul>
+    </li><!-- End my branding Nav -->
+
+    <li class="nav-item">
+      <a class="nav-link " href="{% url 'store:customer-invoice' %}">
+        <i class="fa fa-file"></i>
+        <span>Orders Invoice</span>
+      </a>
+    </li><!-- End Orders-->
+
+    <!-- <li class="nav-heading">Pages</li> -->
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="{% url 'accounts:customer_send_feedback' %}">
+        <i class="fas fa-paper-plane"></i>
+        <span>Send Feedback</span>
+      </a>
+    </li>  
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="{% url 'accounts:customer_feedback' %}">
+        <i class="fas fa-comments"></i>
+        <span>Feedback</span>
+      </a>
+    </li>
+  
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="{% url 'accounts:about-us' %}">
+        <i class="bi bi-question-circle"></i>
+        <span>About Us</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="{% url 'accounts:faq_question_types' %}">
+        <i class="bi bi-question-circle"></i>
+        <span>F.A.Q</span>
+      </a>
+    </li>
+
+  </ul>
+
+</aside><!-- End Sidebar-->

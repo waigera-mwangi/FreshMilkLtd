@@ -11,21 +11,26 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+SECRET_KEY = config('SECRET_KEY')
+
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&_ys5o2^+si@f$!cowd+ce%27$1be-zppmjp7ium(t+@)s6376'
+# SECRET_KEY = 'django-insecure-&_ys5o2^+si@f$!cowd+ce%27$1be-zppmjp7ium(t+@)s6376'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
+    'accounts',
+    'deliveries',
+    'payments',
+    'veterinary',
 ]
 
 MIDDLEWARE = [
@@ -54,13 +64,16 @@ ROOT_URLCONF = 'FreshMilkLtd.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.order_count',
+                
             ],
         },
     },
@@ -111,12 +124,32 @@ USE_I18N = True
 USE_TZ = True
 
 
+import moneyed
+from moneyed import CURRENCIES, Currency
+
+DEFAULT_CURRENCY = 'KES'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'static'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# Static files directories specify additional directories from which Django should collect static files
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+MEDIA_URL = '/media/'
+# Path where media is stored
+MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'accounts.User'
