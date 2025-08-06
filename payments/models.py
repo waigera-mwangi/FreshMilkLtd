@@ -34,27 +34,25 @@ class MilkPrice(models.Model):
 # -------------------------
 # Farmer Payments
 # -------------------------
+
 class Payment(models.Model):
     class PaymentStatus(models.TextChoices):
         PENDING = 'PENDING', _('Pending')
         PAID = 'PAID', _('Paid')
         FAILED = 'FAILED', _('Failed')
-
+    
     farmer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         limit_choices_to={'user_type': 'FR'},  # Only Farmers
         related_name='payments'
     )
+    milk_collections = models.ManyToManyField(MilkCollection, related_name='payments', blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     generated_on = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(  # ✅ New field
-        max_length=10,
-        choices=PaymentStatus.choices,
-        default=PaymentStatus.PENDING
-    )
+    status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING)
     reference = models.CharField(max_length=100, unique=True)
 
     def __str__(self):

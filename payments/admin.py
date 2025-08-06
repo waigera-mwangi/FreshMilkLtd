@@ -25,28 +25,22 @@ class MilkPriceAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('farmer_name', 'amount', 'start_date', 'end_date', 'status', 'reference')
+    list_display = ('farmer', 'amount', 'start_date', 'end_date', 'status', 'reference')
     list_filter = ('status', 'start_date', 'end_date')
     search_fields = ('farmer__first_name', 'farmer__last_name', 'reference')
     date_hierarchy = 'start_date'
     ordering = ('-start_date',)
-    actions = ['generate_weekly_payments', 'generate_monthly_payments', 'export_as_pdf']
+    actions = ['generate_weekly_payments', 'generate_monthly_payments', 'mark_as_paid', 'mark_as_failed']
 
-    def farmer_name(self, obj):
-        return obj.farmer.get_full_name()
-    farmer_name.short_description = 'Farmer'
-
-    # Weekly Payment Generation
     def generate_weekly_payments(self, request, queryset):
         today = date.today()
         start_date = today - timedelta(days=7)
         end_date = today
-        farmers = queryset.values_list('farmer', flat=True).distinct()
+
+        farmers = User.objects.filter(user_type='FR')
         created_count = 0
 
-        for farmer_id in farmers:
-            from accounts.models import User
-            farmer = User.objects.get(id=farmer_id)
+        for farmer in farmers:
             payment = calculate_and_create_payment(farmer, start_date, end_date)
             if payment:
                 created_count += 1
@@ -56,20 +50,17 @@ class PaymentAdmin(admin.ModelAdmin):
             '%d weekly payments generated.',
             created_count,
         ) % created_count, messages.SUCCESS)
-
     generate_weekly_payments.short_description = "Generate Weekly Payments"
 
-    # Monthly Payment Generation
     def generate_monthly_payments(self, request, queryset):
         today = date.today()
         start_date = today.replace(day=1) - timedelta(days=30)
         end_date = today
-        farmers = queryset.values_list('farmer', flat=True).distinct()
+
+        farmers = User.objects.filter(user_type='FR')
         created_count = 0
 
-        for farmer_id in farmers:
-            from accounts.models import User
-            farmer = User.objects.get(id=farmer_id)
+        for farmer in farmers:
             payment = calculate_and_create_payment(farmer, start_date, end_date)
             if payment:
                 created_count += 1
@@ -79,9 +70,18 @@ class PaymentAdmin(admin.ModelAdmin):
             '%d monthly payments generated.',
             created_count,
         ) % created_count, messages.SUCCESS)
-
     generate_monthly_payments.short_description = "Generate Monthly Payments"
 
+    def mark_as_paid(self, request, queryset):
+        updated = queryset.update(status=Payment.PaymentStatus.PAID)
+        self.message_user(request, f"{updated} payments marked as PAID", messages.SUCCESS)
+    mark_as_paid.short_description = "Mark selected as Paid"
+
+    def mark_as_failed(self, request, queryset):
+        updated = queryset.update(status=Payment.PaymentStatus.FAILED)
+        self.message_user(request, f"{updated} payments marked as FAILED", messages.ERROR)
+    mark_as_failed.short_description = "Mark selected as Failed"
+    
     # Export as PDF
     def export_as_pdf(self, request, queryset):
         buffer = BytesIO()

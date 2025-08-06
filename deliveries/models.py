@@ -59,6 +59,7 @@ class MilkCollection(TimeStamp):
     validators=[MinValueValidator(Decimal('0.10'))],
     help_text="Price per liter at the time of collection"
 )
+    is_paid = models.BooleanField(default=False)
     remarks = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
