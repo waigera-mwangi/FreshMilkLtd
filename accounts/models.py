@@ -20,13 +20,11 @@ class TimeStamp(models.Model):
         
 class User(AbstractUser, PermissionsMixin):
     class UserTypes(models.TextChoices):
-        CUSTOMER = 'CM', _('CUSTOMER')
-        DRIVER = 'DR', _('DRIVER')
-        INVENTORY_MANAGER = 'IM', _('INVENTORY MANAGER')
-        SERVICE_PROVIDER = 'SP', _('SERVICE PROVIDER')
-        SUPPLIER = 'SR', _('SUPPLIER')
-        INSTALLER = 'IS', _('INSTALLER')
+        FARMER = 'FR', _('FARMER')
         FINANCE_MANAGER = 'FM', _('FINANCE MANAGER')
+        FIELD_AGENT = 'FA', _('FIELD AGENT')
+        FIELD_MANAGER = 'FD', _('FIELD MANAGER')
+        VETERINARY_OFFICER = 'VO', _('VETERINARY OFFICER')
         ADMIN = 'AD', _('ADMIN')
         
     user_type = models.CharField(
@@ -37,8 +35,8 @@ class User(AbstractUser, PermissionsMixin):
     first_name = models.CharField( max_length=250)
     last_name = models.CharField( max_length=250)
     phone_number = CustomPhoneNumberField(unique=True, null=True)
-    county = models.CharField(max_length=20)
     town = models.CharField(max_length=20)
+    location = models.CharField(max_length=20)
     is_active = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
     updated = models.DateField(auto_now=True)
@@ -65,8 +63,8 @@ class Profile(models.Model):
     image = models.ImageField(upload_to='Users/profile_pictures/%Y/%m/',
                               default="null")
     phone_number = CustomPhoneNumberField(null=False)
-    county = models.CharField(max_length=20)
     town = models.CharField(max_length=20)
+    location = models.CharField(max_length=20)
     is_active = models.BooleanField(_('Active'), default=True, help_text=_('Activated, users profile is published'))
     updated = models.DateField(_('Updated'), auto_now=True)
     created = models.DateField(_('Created'), auto_now_add=True)
@@ -76,13 +74,13 @@ class Profile(models.Model):
         default=Gender.MALE,
     )
     
-# customer
-class CustomerProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer_profile')
+# farmer
+class FarmerProfile(Profile):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='farmer_profile')
 
     class Meta:
-        verbose_name = 'Customer Profile'
-        verbose_name_plural = 'Customer Profile'
+        verbose_name = 'Farmer Profile'
+        verbose_name_plural = 'Farmer Profile'
         
 # finance manager
 class FinanceProfile(Profile):
@@ -91,42 +89,38 @@ class FinanceProfile(Profile):
     class Meta:
         verbose_name = 'Finance Profile'
         verbose_name_plural = 'Finance Profile'
-# installer
-class InstallerProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='installer_profile')
+# Field Agent
+class FieldProfile(Profile):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='field_agent_profile')
 
     class Meta:
-        verbose_name = 'Installer Profile'
-        verbose_name_plural = 'Installer Profile'
+        verbose_name = 'Field Agent Profile'
+        verbose_name_plural = 'Field Agent Profile'
 
-# driver
-class DriverProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='driver_profile')
-
-    class Meta:
-        verbose_name = 'Driver Profile'
-        verbose_name_plural = 'Driver Profile'
-#  service
-class ServiceProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='service_provider_profile')
+# manager
+class ManagerProfile(Profile):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='field_manager_profile')
 
     class Meta:
-        verbose_name = 'Service Profile'
-        verbose_name_plural = 'Service Profile'
+        verbose_name = 'Field Manager Profile'
+        verbose_name_plural = 'Field Manager Profile'
         
-class SupplierProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='supplier_profile')
+#  veterinary
+class VeterinaryProfile(Profile):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='veterinary_profile')
 
     class Meta:
-        verbose_name = 'Supplier Profile'
-        verbose_name_plural = 'Supplier Profile'
+        verbose_name = 'Veterinary Profile'
+        verbose_name_plural = 'Veterinary Profile'
+        
 
-class Customer(User):
+
+class Farmer(User):
     pass
 
     class Meta:
-        verbose_name = 'Customer'
-        verbose_name_plural = 'Customers'
+        verbose_name = 'Farmer'
+        verbose_name_plural = 'Farmers'
         
 class Finance(User):
     pass
@@ -135,33 +129,28 @@ class Finance(User):
         verbose_name = 'Finance'
         verbose_name_plural = 'Finance'
 
-class Supply(User):
+class Agent(User):
     pass
 
     class Meta:
-        verbose_name = 'Supplier'
-        verbose_name_plural = 'Suppliers'
+        verbose_name = 'Agents'
+        verbose_name_plural = 'Agents'
         
-class Service(User):
+class Manager(User):
     pass
 
     class Meta:
-        verbose_name = 'Service_Manager'
-        verbose_name_plural = 'Service_Managers'
+        verbose_name = 'Manager'
+        verbose_name_plural = 'Managers'
         
-class Inventory(User):
+class Veterinary(User):
     pass
 
     class Meta:
-        verbose_name = 'Inventory'
-        verbose_name_plural = 'Inventory'
+        verbose_name = 'Veterinary'
+        verbose_name_plural = 'Veterinaries'
         
-class Driver(User):
-    pass
 
-    class Meta:
-        verbose_name = 'Driver'
-        verbose_name_plural = 'Drivers'
         
 
 # class UserProfileManager(BaseUserManager):
