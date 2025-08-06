@@ -1,172 +1,139 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from django.conf import settings
 
-# Create your models here.
 
+# -------------------
+# Custom Manager
+# -------------------
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        if not username:
+            raise ValueError(_('The Username field is required'))
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+
+        return self.create_user(username, email, password, **extra_fields)
+
+
+# -------------------
+# Custom Phone Field
+# -------------------
 class CustomPhoneNumberField(PhoneNumberField):
     default_error_messages = {
         'Invalid': 'Please enter a valid phone number in the format +254700000000'
     }
-  
+
+
+# -------------------
+# Abstract Timestamp
+# -------------------
 class TimeStamp(models.Model):
-    updated = models.DateField(auto_now=True)
-    created = models.DateField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
-        
-        
-class User(AbstractUser, PermissionsMixin):
+
+
+# -------------------
+# Custom User Model
+# -------------------
+class User(AbstractUser):
     class UserTypes(models.TextChoices):
-        FARMER = 'FR', _('FARMER')
-        FINANCE_MANAGER = 'FM', _('FINANCE MANAGER')
-        FIELD_AGENT = 'FA', _('FIELD AGENT')
-        FIELD_MANAGER = 'FD', _('FIELD MANAGER')
-        VETERINARY_OFFICER = 'VO', _('VETERINARY OFFICER')
-        ADMIN = 'AD', _('ADMIN')
-        
-    user_type = models.CharField(
-        max_length=2,
-        choices = UserTypes.choices,
-        default=UserTypes.FARMER,
-    )
-    first_name = models.CharField( max_length=250)
-    last_name = models.CharField( max_length=250)
+        FARMER = 'FR', _('Farmer')
+        FINANCE_MANAGER = 'FM', _('Finance Manager')
+        FIELD_AGENT = 'FA', _('Field Agent')
+        FIELD_MANAGER = 'FD', _('Field Manager')
+        VETERINARY_OFFICER = 'VO', _('Veterinary Officer')
+        ADMIN = 'AD', _('Admin')
+
+    email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = CustomPhoneNumberField(unique=True, null=True)
-    town = models.CharField(max_length=20)
-    location = models.CharField(max_length=20)
-    is_active = models.BooleanField(default=False)
+    user_type = models.CharField(max_length=2, choices=UserTypes.choices, default=UserTypes.FARMER)
+    town = models.CharField(max_length=50, blank=True)
+    location = models.CharField(max_length=50, blank=True)
+    is_active = models.BooleanField(default=True)
     is_archived = models.BooleanField(default=False)
-    updated = models.DateField(auto_now=True)
-    created = models.DateField(auto_now_add=True)
 
-    def get_user_type_display(self):
-        return dict(User.UserTypes.choices)[self.user_type]
+    objects = CustomUserManager()
 
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def get_user_type_display(self):
+        return dict(User.UserTypes.choices).get(self.user_type, "Unknown")
 
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
-# profiles
-class Profile(models.Model):
-    class Gender(models.TextChoices):
-        MALE = 'M', _('Male')
-        FEMALE = 'F', _('Female')
-        OTHER = 'O', _('Other')
 
-    image = models.ImageField(upload_to='Users/profile_pictures/%Y/%m/',
-                              default="null")
+# -------------------
+# Base Profile Model
+# -------------------
+class Profile(TimeStamp):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='Users/profile_pictures/%Y/%m/', default="null")
     phone_number = CustomPhoneNumberField(null=False)
-    town = models.CharField(max_length=20)
-    location = models.CharField(max_length=20)
-    is_active = models.BooleanField(_('Active'), default=True, help_text=_('Activated, users profile is published'))
-    updated = models.DateField(_('Updated'), auto_now=True)
-    created = models.DateField(_('Created'), auto_now_add=True)
+    town = models.CharField(max_length=50)
+    location = models.CharField(max_length=50)
     gender = models.CharField(
-        max_length=2,
-        choices=Gender.choices,
-        default=Gender.MALE,
+        max_length=1,
+        choices=[('M', _('Male')), ('F', _('Female')), ('O', _('Other'))],
+        default='M'
     )
-    
-# farmer
-class FarmerProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='farmer_profile')
+    is_active = models.BooleanField(default=True)
 
+    class Meta:
+        abstract = True
+
+
+# -------------------
+# Specific Profiles
+# -------------------
+class FarmerProfile(Profile):
     class Meta:
         verbose_name = 'Farmer Profile'
-        verbose_name_plural = 'Farmer Profile'
-        
-# finance manager
-class FinanceProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='finance_profile')
+        verbose_name_plural = 'Farmer Profiles'
 
+
+class FinanceProfile(Profile):
     class Meta:
         verbose_name = 'Finance Profile'
-        verbose_name_plural = 'Finance Profile'
-# Field Agent
-class FieldProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='field_agent_profile')
+        verbose_name_plural = 'Finance Profiles'
 
+
+class FieldProfile(Profile):
     class Meta:
         verbose_name = 'Field Agent Profile'
-        verbose_name_plural = 'Field Agent Profile'
+        verbose_name_plural = 'Field Agent Profiles'
 
-# manager
+
 class ManagerProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='field_manager_profile')
-
     class Meta:
         verbose_name = 'Field Manager Profile'
-        verbose_name_plural = 'Field Manager Profile'
-        
-#  veterinary
-class VeterinaryProfile(Profile):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='veterinary_profile')
+        verbose_name_plural = 'Field Manager Profiles'
 
+
+class VeterinaryProfile(Profile):
     class Meta:
         verbose_name = 'Veterinary Profile'
-        verbose_name_plural = 'Veterinary Profile'
-        
-
-
-class Farmer(User):
-    pass
-
-    class Meta:
-        verbose_name = 'Farmer'
-        verbose_name_plural = 'Farmers'
-        
-class Finance(User):
-    pass
-
-    class Meta:
-        verbose_name = 'Finance'
-        verbose_name_plural = 'Finance'
-
-class Agent(User):
-    pass
-
-    class Meta:
-        verbose_name = 'Agents'
-        verbose_name_plural = 'Agents'
-        
-class Manager(User):
-    pass
-
-    class Meta:
-        verbose_name = 'Manager'
-        verbose_name_plural = 'Managers'
-        
-class Veterinary(User):
-    pass
-
-    class Meta:
-        verbose_name = 'Veterinary'
-        verbose_name_plural = 'Veterinaries'
-        
-
-        
-
-# class UserProfileManager(BaseUserManager):
-#     """Helps Django work with our custom user model."""
-
-#     def create_user(self, email, username, password=None):
-#         """Creates a user profile object."""
-
-#         if not email:
-#             raise ValueError('User must have an email address.')
-
-#         email = self.normalize_email(email)
-#         user = self.model(email=email, username=username)
-
-#         user.user_id = -1
-#         user.set_password(password)
-#         user.save(using=self._db)
-
-#         return user
+        verbose_name_plural = 'Veterinary Profiles'
