@@ -30,7 +30,7 @@ class User(AbstractUser, PermissionsMixin):
     user_type = models.CharField(
         max_length=2,
         choices = UserTypes.choices,
-        default=UserTypes.CUSTOMER,
+        default=UserTypes.FARMER,
     )
     first_name = models.CharField( max_length=250)
     last_name = models.CharField( max_length=250)
