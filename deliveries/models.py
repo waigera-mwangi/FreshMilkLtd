@@ -53,7 +53,22 @@ class MilkCollection(TimeStamp):
         validators=[MinValueValidator(Decimal('0.10'))]
     )
     collection_date = models.DateField()
+    price_per_liter = models.DecimalField(
+    max_digits=8,
+    decimal_places=2,
+    validators=[MinValueValidator(Decimal('0.10'))],
+    help_text="Price per liter at the time of collection"
+)
     remarks = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Auto-set price if not already provided
+        if not self.price_per_liter:
+            from payments.models import MilkPrice  # Import here to avoid circular import
+            active_price = MilkPrice.objects.filter(is_active=True).order_by('-effective_date').first()
+            if active_price:
+                self.price_per_liter = active_price.price_per_liter
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.farmer.get_full_name()} - {self.quantity_liters} L"
