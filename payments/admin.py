@@ -1,12 +1,16 @@
 from django.contrib import admin, messages
-from .models import MilkPrice, Payment
-from .utils import calculate_and_create_payment
-from datetime import date, timedelta
 from django.utils.translation import ngettext
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from datetime import date, timedelta
 from io import BytesIO
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle, SimpleDocTemplate
+from .models import *
+from .utils import calculate_and_create_payment
+from accounts.models import User
 
 
 @admin.register(MilkPrice)
@@ -30,7 +34,13 @@ class PaymentAdmin(admin.ModelAdmin):
     search_fields = ('farmer__first_name', 'farmer__last_name', 'reference')
     date_hierarchy = 'start_date'
     ordering = ('-start_date',)
-    actions = ['generate_weekly_payments', 'generate_monthly_payments', 'mark_as_paid', 'mark_as_failed']
+    actions = [
+        'generate_weekly_payments',
+        'generate_monthly_payments',
+        'mark_as_paid',
+        'mark_as_failed',
+        'export_as_pdf',
+    ]
 
     def generate_weekly_payments(self, request, queryset):
         today = date.today()
@@ -82,26 +92,45 @@ class PaymentAdmin(admin.ModelAdmin):
         self.message_user(request, f"{updated} payments marked as FAILED", messages.ERROR)
     mark_as_failed.short_description = "Mark selected as Failed"
     
-    # Export as PDF
+    
+# export to pdf
+    
     def export_as_pdf(self, request, queryset):
         buffer = BytesIO()
-        p = canvas.Canvas(buffer, pagesize=letter)
-        y = 750
-        p.setFont("Helvetica", 12)
-        p.drawString(200, 800, "Payment Report")
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        elements = []
+
+        # Define table data
+        data = [['Farmer', 'Amount (KES)', 'Start Date', 'End Date', 'Status']]  # table headers
 
         for payment in queryset:
-            p.drawString(50, y, f"Farmer: {payment.farmer.get_full_name()}, Amount: {payment.amount}, "
-                                f"Period: {payment.start_date} - {payment.end_date}, Status: {payment.status}")
-            y -= 20
-            if y < 50:
-                p.showPage()
-                y = 750
+            data.append([
+                payment.farmer.get_full_name(),
+                f"{payment.amount:.2f}",
+                str(payment.start_date),
+                str(payment.end_date),
+                payment.status
+            ])
 
-        p.save()
+        # Create table and apply styles
+        table = Table(data, colWidths=[2.5*inch, 1.2*inch, 1.2*inch, 1.2*inch, 1.2*inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ]))
+
+        elements.append(table)
+        doc.build(elements)
+
         buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="payments_report.pdf"'
-        return response
+        return HttpResponse(buffer, content_type='application/pdf', headers={
+            'Content-Disposition': 'attachment; filename="payments_report.pdf"'
+        })
 
     export_as_pdf.short_description = "Export Selected Payments to PDF"
