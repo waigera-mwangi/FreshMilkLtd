@@ -1,0 +1,62 @@
+{% extends 'farmer/layouts/farmer-base.html' %}
+
+{% block title %}Farmer Dashboard{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4" style="color: #333;">Welcome, {{ request.user.get_full_name }}</h2>
+
+    <!-- Delivery Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="alert alert-info shadow-sm">
+                <strong>Total Milk Delivered:</strong> {{ total_litres }} Litres<br>
+                <strong>Pending Payment:</strong> KSh {{ unpaid_amount|floatformat:2 }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Milk Delivery History -->
+    <div class="row mb-5">
+        <div class="col">
+            <h4 style="color: #333;">My Milk Deliveries</h4>
+            {% if deliveries %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Quantity (L)</th>
+                                <th>Pickup Location</th>
+                                <th>Price/L</th>
+                                <th>Paid</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for delivery in deliveries %}
+                            <tr>
+                                <td>{{ delivery.collection_date }}</td>
+                                <td>{{ delivery.quantity_liters }}</td>
+                                <td>{{ delivery.pickup_location }}</td>
+                                <td>KSh {{ delivery.price_per_liter }}</td>
+                                <td>
+                                    {% if delivery.is_paid %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ delivery.remarks|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>No milk deliveries found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
