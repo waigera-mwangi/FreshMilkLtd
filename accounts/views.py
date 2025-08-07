@@ -63,7 +63,7 @@ def loginView(request):
                     
                     elif user.user_type == "VO":
                         login(request, user)
-                        return redirect('accounts:veterinary_officer')
+                        return redirect('accounts:veterinary')
                     
                 else:
                     messages.warning(request, 'Waiting for admin approval')
@@ -100,7 +100,7 @@ def field_manager(request):
 
 @required_access(login_url=reverse_lazy('accounts:login'), user_type="VO")
 def veterinary(request):
-       return render(request, 'veterinary/pages/index.html')
+       return redirect('veterinary:vet_dashboard')
 
 
 #Change password
