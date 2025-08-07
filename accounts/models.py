@@ -81,6 +81,11 @@ class User(AbstractUser):
     def get_user_type_display(self):
         return dict(User.UserTypes.choices).get(self.user_type, "Unknown")
 
+    def save(self, *args, **kwargs):
+        if self.username:
+            self.username = self.username.lower()
+        super().save(*args, **kwargs)
+    
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'

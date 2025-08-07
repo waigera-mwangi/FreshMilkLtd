@@ -39,7 +39,7 @@ def loginView(request):
 
     if request.method == 'POST':
         if loginform.is_valid():
-            username = loginform.cleaned_data.get('username')
+            username = loginform.cleaned_data.get('username').lower()
             password = loginform.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             
