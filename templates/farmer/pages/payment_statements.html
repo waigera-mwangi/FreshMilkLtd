@@ -1,0 +1,51 @@
+{% extends 'farmer/layouts/farmer-base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Payment Statements</h2>
+
+  <div class="mb-3 text-end">
+    <a href="{% url 'payments:export_payment_statements_pdf' %}" class="btn btn-sm btn-outline-primary">
+      <i class="bi bi-file-earmark-pdf"></i> Export to PDF
+    </a>
+  </div>
+
+  {% if statements %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Reference</th>
+            <th>Period</th>
+            <th>Amount (KSh)</th>
+            <th>Status</th>
+            <th>Generated On</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for statement in statements %}
+          <tr>
+            <td>{{ statement.reference }}</td>
+            <td>{{ statement.start_date }} to {{ statement.end_date }}</td>
+            <td>KSh {{ statement.amount|floatformat:2|intcomma }}</td>
+            <td>
+              {% if statement.status == 'PAID' %}
+                <span class="badge bg-success">Paid</span>
+              {% elif statement.status == 'PENDING' %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% else %}
+                <span class="badge bg-danger">Failed</span>
+              {% endif %}
+            </td>
+            <td>{{ statement.generated_on|date:"M d, Y H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">No payment statements available.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,9 +1,11 @@
 from django.urls import path
 from . import views
 
-app_name = 'deliveries'
+app_name = 'payments'
 
 urlpatterns = [
-    # path('', views.index, name='index'),
-    # Add more routes as needed
+     path('payments/', views.payment_statements, name='payment_statements'),
+     path('payments/pdf/', views.export_payment_statements_pdf, name='export_payment_statements_pdf'),
+
+     
 ]

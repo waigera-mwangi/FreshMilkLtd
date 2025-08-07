@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: DejaVu Sans, sans-serif; font-size: 10pt; }
+    h2 { text-align: center; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #555;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h2>Payment Statements for {{ farmer.get_full_name }}</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Amount (KSh)</th>
+        <th>Status</th>
+        <th>Generated On</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for payment in payments %}
+      <tr>
+        <td>{{ payment.reference }}</td>
+        <td>{{ payment.start_date }}</td>
+        <td>{{ payment.end_date }}</td>
+        <td>{{ payment.amount|floatformat:2 }}</td>
+        <td>{{ payment.get_status_display }}</td>
+        <td>{{ payment.generated_on|date:"M d, Y H:i" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
