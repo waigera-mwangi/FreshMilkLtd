@@ -1,5 +1,4 @@
 {% extends 'farmer/layouts/farmer-base.html' %}
-
 {% load humanize %}
 
 {% block content %}
@@ -11,19 +10,19 @@
       <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th scope="col">Date</th>
-            <th scope="col">Quantity (L)</th>
-            <th scope="col">Price/Litre</th>
-            <th scope="col">Total</th>
-            <th scope="col">Status</th>
+            <th>Date</th>
+            <th>Quantity (L)</th>
+            <th>Price/Litre</th>
+            <th>Total</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {% for delivery in deliveries %}
           <tr>
             <td>{{ delivery.collection_date|date:"M d, Y" }}</td>
-            <td>{{ delivery.quantity_liters|floatformat:2 }}</td>
-            <td>KSh {{ delivery.price_per_liter|floatformat:2|intcomma }}</td>
+            <td>{{ delivery.quantity_liters }}</td>
+            <td>KSh {{ delivery.price_per_liter|floatformat:2 }}</td>
             <td>KSh {{ delivery.total_amount|floatformat:2|intcomma }}</td>
             <td>
               {% if delivery.is_paid %}
@@ -35,14 +34,38 @@
           </tr>
           {% endfor %}
         </tbody>
-        <tfoot>
-          <tr class="table-secondary">
-            <td colspan="3" class="text-end fw-bold">Grand Total</td>
-            <td colspan="2" class="fw-bold">KSh {{ grand_total|floatformat:2|intcomma }}</td>
+        <tfoot class="table-light fw-bold">
+          <tr>
+            <td>Total</td>
+            <td>{{ total_quantity|floatformat:2 }}</td>
+            <td></td>
+            <td>KSh {{ grand_total|floatformat:2|intcomma }}</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Paid Subtotal</td>
+            <td>{{ paid_quantity|floatformat:2 }}</td>
+            <td></td>
+            <td>KSh {{ paid_total|floatformat:2|intcomma }}</td>
+            <td><span class="badge bg-success">Paid</span></td>
+          </tr>
+          <tr>
+            <td>Unpaid Subtotal</td>
+            <td>{{ unpaid_quantity|floatformat:2 }}</td>
+            <td></td>
+            <td>KSh {{ unpaid_total|floatformat:2|intcomma }}</td>
+            <td><span class="badge bg-danger">Unpaid</span></td>
           </tr>
         </tfoot>
       </table>
     </div>
+
+    <div class="mb-3 text-end">
+  <a href="{% url 'deliveries:export_milk_history_pdf' %}" class="btn btn-outline-primary">
+    <i class="bi bi-file-earmark-pdf"></i> Download PDF
+  </a>
+</div>
+
   {% else %}
     <div class="alert alert-info">No milk deliveries found.</div>
   {% endif %}

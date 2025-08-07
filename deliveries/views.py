@@ -5,6 +5,9 @@ from django.db.models import Sum
 from django.utils.dateformat import DateFormat
 from collections import defaultdict
 from decimal import Decimal
+from django.template.loader import get_template
+from django.http import HttpResponse
+from xhtml2pdf import pisa
 
 
 @login_required
@@ -48,14 +51,68 @@ def milk_history(request):
     deliveries = MilkCollection.objects.filter(farmer=farmer).order_by('-collection_date')
     
     grand_total = Decimal(0)
+    total_quantity = Decimal(0)
+    grand_total = Decimal(0)
+    paid_total = Decimal(0)
+    unpaid_total = Decimal(0)
+    paid_quantity = Decimal(0)
+    unpaid_quantity = Decimal(0)
+    
+    
     for delivery in deliveries:
-        quantity = Decimal(delivery.quantity_liters)
-        price = Decimal(delivery.price_per_liter)
-        delivery.total_amount = quantity * price
+        delivery.total_amount = Decimal(str(delivery.quantity_liters)) * Decimal(str(delivery.price_per_liter))
         grand_total += delivery.total_amount
+        total_quantity += Decimal(str(delivery.quantity_liters))
+
+        if delivery.is_paid:
+            paid_total += delivery.total_amount
+            paid_quantity += Decimal(str(delivery.quantity_liters))
+        else:
+            unpaid_total += delivery.total_amount
+            unpaid_quantity += Decimal(str(delivery.quantity_liters))
 
     context = {
         'deliveries': deliveries,
         'grand_total': grand_total,
+        'total_quantity': total_quantity,
+        'paid_total': paid_total,
+        'unpaid_total': unpaid_total,
+        'paid_quantity': paid_quantity,
+        'unpaid_quantity': unpaid_quantity,
     }
     return render(request, 'farmer/pages/milk_history.html', context)
+
+
+# farmer export to pdf
+@login_required
+def export_milk_history_pdf(request):
+    farmer = request.user
+    deliveries = MilkCollection.objects.filter(farmer=farmer).order_by('-collection_date')
+
+    # Totals
+    from decimal import Decimal
+    grand_total = Decimal(0)
+    total_quantity = Decimal(0)
+
+    for d in deliveries:
+        d.total_amount = Decimal(str(d.quantity_liters)) * Decimal(str(d.price_per_liter))
+        grand_total += d.total_amount
+        total_quantity += Decimal(str(d.quantity_liters))
+
+    template_path = 'farmer/pages/milk_history_pdf.html'
+    context = {
+        'deliveries': deliveries,
+        'grand_total': grand_total,
+        'total_quantity': total_quantity,
+    }
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="milk_history.pdf"'
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('PDF generation failed')
+    return response
