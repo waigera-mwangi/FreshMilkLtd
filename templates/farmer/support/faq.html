@@ -1,0 +1,14 @@
+{% extends 'farmer/layouts/farmer-base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Frequently Asked Questions</h2>
+    <ul>
+        {% for faq in faqs %}
+            <li>
+                <strong>{{ faq.question }}</strong><br>
+                {{ faq.answer }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

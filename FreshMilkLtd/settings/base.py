@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'deliveries',
     'payments',
     'veterinary',
+    'support',
 ]
 
 MIDDLEWARE = [

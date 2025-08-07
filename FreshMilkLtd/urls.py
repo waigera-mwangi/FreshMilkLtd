@@ -29,6 +29,7 @@ urlpatterns = [
     path('', include('deliveries.urls')),
     path('', include('payments.urls')),
     path('', include('veterinary.urls')),
+    path('', include('support.urls')),
     
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
