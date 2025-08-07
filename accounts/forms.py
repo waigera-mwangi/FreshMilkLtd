@@ -55,7 +55,7 @@ class LoginForm(forms.Form):
 # -------------------
 # Public Sign-Up Form (for customers/farmers)
 # -------------------
-class CustomerSignUpForm(UserCreationForm):
+class FarmerSignUpForm(UserCreationForm):
     """
     Form for registering normal customers/farmers from the frontend.
     """
@@ -74,7 +74,7 @@ class CustomerSignUpForm(UserCreationForm):
 # -------------------
 # Custom Authentication Form
 # -------------------
-class CustomerAuthenticationForm(AuthenticationForm):
+class FarmerAuthenticationForm(AuthenticationForm):
     """
     Custom login validation to prevent certain roles from using customer login.
     """

@@ -1,94 +1,87 @@
-
-{% comment %} <aside id="sidebar" class="sidebar">
-   {% endcomment %}
-   <aside id="layout-menu" class="sidebar">
+<aside id="layout-menu" class="sidebar">
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
+    <!-- Dashboard -->
     <li class="nav-item">
-      <a class="nav-link " href="{% url 'store:view-products' %}">
-        <i class="bi bi-grid"></i>
+      <a class="nav-link" href="{% url 'deliveries:view-deliveries' %}">
+        <i class="bi bi-speedometer2"></i>
         <span>Dashboard</span>
       </a>
     </li>
-    <!-- End Dashboard Nav -->
 
+    <!-- Milk Deliveries -->
     <li class="nav-item">
-      <a class="nav-link" href="{% url 'store:view-products' %}">
-        <i class="bi bi-shop"></i>
-        <span>Products</span>
+      <a class="nav-link" href="#">
+        <i class="fas fa-cow"></i>
+        <span>Milk Deliveries</span>
       </a>
     </li>
 
-    
-    <!-- End Categories Nav -->
-      
+    <!-- Milk History -->
     <li class="nav-item">
-      <a class="nav-link " href="{% url 'store:farmer-order-list' %}">
-        <i class="fa fa-truck"></i>
-        <span>My Orders</span>
+      <a class="nav-link" href="#">
+        <i class="fas fa-history"></i>
+        <span>Milk History</span>
       </a>
-    </li><!-- End Orders-->
+    </li>
+
+    <!-- Payment Statements -->
+    <li class="nav-item">
+      <a class="nav-link" href="#">
+        <i class="fas fa-money-check-alt"></i>
+        <span>Payment Statements</span>
+      </a>
+    </li>
+
+    <!-- Services -->
+    <li class="nav-item">
+      <a class="nav-link" href="#">
+        <i class="fas fa-tools"></i>
+        <span>Request Service</span>
+      </a>
+    </li>
 
     <li class="nav-item">
-      <a class="nav-link " href="{% url 'store:farmer-receipt' %}">
-        <i class="fa fa-file"></i>
-        <span>Orders Receipt</span>
+      <a class="nav-link" href="#">
+        <i class="fas fa-calendar-check"></i>
+        <span>My Services</span>
       </a>
-    </li><!-- End Orders-->
+    </li>
 
-
-      <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-         <i class="fas fa-edit"></i><span>Services</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-
-      <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        
-        <li>
-          <a href="{% url 'services:view-services' %}">
-           <i class="bi bi-receipt" style="font-size: large"></i><span>Book service</span>
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'services:booked-services' %}">
-           <i class="bi bi-receipt" style="font-size: large"></i><span>Booked service(s)</span>
-          </a>
-        </li>
-      </ul>
-    </li><!-- End my branding Nav -->
-
-
-    <!-- <li class="nav-heading">Pages</li> -->
+    <!-- Training & Resources (Future) -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:farmer_send_feedback' %}">
+      <a class="nav-link" href="#">
+        <i class="fas fa-book-open"></i>
+        <span>Training & Resources</span>
+      </a>
+    </li>
+
+    <!-- Support & Feedback -->
+    <li class="nav-item">
+      <a class="nav-link" href="#">
         <i class="fas fa-paper-plane"></i>
         <span>Send Feedback</span>
       </a>
-    </li>  
+    </li>
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:farmer_feedback' %}">
-        <i class="fas fa-comments"></i>
-        <span>Feedback</span>
+      <a class="nav-link" href="#">
+        <i class="fas fa-headset"></i>
+        <span>Contact Support</span>
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:contact_us' %}">
-        <i class="fas fa-comments"></i>
-        <span>Contact us</span>
-      </a>
-    </li>
-  
 
+    <!-- Information -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:about-us' %}">
-        <i class="bi bi-question-circle"></i>
+      <a class="nav-link" href="#">
+        <i class="bi bi-info-circle"></i>
         <span>About Us</span>
       </a>
     </li>
+
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:faq_question_types' %}">
+      <a class="nav-link" href="#">
         <i class="bi bi-question-circle"></i>
         <span>F.A.Q</span>
       </a>
@@ -96,4 +89,4 @@
 
   </ul>
 
-</aside><!-- End Sidebar-->
+</aside><!-- End Sidebar -->

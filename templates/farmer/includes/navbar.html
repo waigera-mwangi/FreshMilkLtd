@@ -1,162 +1,76 @@
 {% load static %}
-  <!-- ======= Header ======= -->
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">  
-  </script>  
 
-  <header id="header" class="header fixed-top d-flex align-items-center">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <div class="d-flex align-items-center justify-content-between">
-      <a href="{% url 'accounts:farmer' %}" class="logo d-flex align-items-center">
+<header id="header" class="header fixed-top d-flex align-items-center">
 
-        <span class="d-none d-lg-block">Fresh Milk Ltd</span>
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div><!-- End Logo -->
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="{% url 'accounts:farmer' %}" class="logo d-flex align-items-center">
+      <span class="d-none d-lg-block">Fresh Milk Ltd</span>
+    </a>
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+  </div><!-- End Logo -->
 
-    
-    <div class="search-bar">
-      <!-- base.html or any template where you want the search form -->
-    <form action="{% url 'store:search' %}" method="get" class="form-inline my-2 my-lg-0">
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <form action="" method="get" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ request.GET.q }}">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
     </form>
+  </div>
+  <!-- End Search Bar -->
 
-    </div>
-      
-    <!-- End Search Bar -->
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
 
-    <nav class="header-nav ms-auto">
-      <ul class="d-flex align-items-center">
-
-        <li class="nav-item d-block d-lg-none">
-          <a class="nav-link nav-icon search-bar-toggle " href="#">
-            <i class="bi bi-search"></i>
-          </a>
-        </li><!-- End Search Icon-->
-
-
-         <!-- Cute Message -->
-         <!-- <div style="padding: 10px;"> 
-
-          <li class="nav-item position-relative">
-            <a class="nav-link" href="">
-              <i class="bx bx-envelope"></i>
-              {% if unread_message_count > 0 %}
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  {{ unread_message_count }}
-                  <span class="visually-hidden">unread messages</span>
-                </span>
-              {% endif %}
-            </a>
-          </li> -->
-
-          <!-- /Cute Message -->
-
-          </div>
-                            
-         <div style="padding: 15px">
-         <!-- Cart -->
-         <li class="nav-item">
-          <a class="nav-link position-relative" href="{% url 'store:view_cart' %}">
-            <i class="bx bx-cart-alt"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-           
-              {% if request.user.is_authenticated %}
-              {{ order_count }}
-                {% else %}
-                  0
-                {% endif %}
-                              
-            </span>
-          </a>
-        </li>
-        <!-- /Cart --> 
-         </div>
-
-        
-      
-            <!-- loading profile picture -->
-
-            {% load static %}
-
-<a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-  {% if request.user.is_authenticated %}
-    {% if request.user.farmer_profile.image %}
-      <img class="rounded-circle" src="{{ request.user.farmer_profile.image.url }}" alt="Profile Picture">
-    {% else %}
-      <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default">
-    {% endif %}
-  {% else %}
-    <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default Picture">
-  {% endif %}
-</a>
-
-            
-          
-
-
-          <!-- end of profile picture  -->
-
-  
-        <li class="nav-item dropdown pe-3">
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6>{{ request.user.get_full_name|title }}</h6>
-              <small class="text-muted" >Hello {{user.get_user_type_display}}!</small>
-<!-- {#              <span>farmer</span>#} -->
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-
-
-        <li class="nav-item">
-        <a class="nav-link collapsed" href="#">
-          <i class="bi bi-person" style="font-size: large"></i>
-          <span>Change password</span>
+      <!-- Search Icon (for mobile) -->
+      <li class="nav-item d-block d-lg-none">
+        <a class="nav-link nav-icon search-bar-toggle" href="#">
+          <i class="bi bi-search"></i>
         </a>
       </li>
 
-      <li>
-        <hr class="dropdown-divider">
+      <!-- Profile Picture -->
+      <li class="nav-item dropdown pe-3">
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          {% if request.user.is_authenticated and request.user.farmer_profile.image %}
+            <img class="rounded-circle" src="{{ request.user.farmer_profile.image.url }}" alt="Profile Picture">
+          {% else %}
+            <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default Picture">
+          {% endif %}
+        </a>
+
+        <!-- Dropdown Menu -->
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header">
+            <h6>{{ request.user.get_full_name|title }}</h6>
+            <small class="text-muted">Hello {{ user.get_user_type_display }}!</small>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="#">
+              <i class="bi bi-person"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+
+        </ul>
+        <!-- End Dropdown -->
       </li>
+      <!-- End Profile Nav -->
 
+    </ul>
+  </nav><!-- End Icons Navigation -->
 
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
-              </a>
-            </li>
-
-            
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
-      </ul>
-    </nav><!-- End Icons Navigation -->
-
-  </header><!-- End Header -->
+</header><!-- End Header -->

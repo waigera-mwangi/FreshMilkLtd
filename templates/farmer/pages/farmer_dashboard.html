@@ -4,25 +4,35 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center mb-4" style="color: #333;">Welcome, {{ request.user.get_full_name }}</h2>
+    <h4 class="text-center mb-4" style="color: #333;">Welcome, {{ request.user.get_full_name }}</h4>
 
     <!-- Delivery Summary -->
     <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="alert alert-info shadow-sm">
-                <strong>Total Milk Delivered:</strong> {{ total_litres }} Litres<br>
-                <strong>Pending Payment:</strong> KSh {{ unpaid_amount|floatformat:2 }}
+        <div class="col-md-6 col-12">
+            <div class="alert alert-info shadow-sm text-center">
+                <div><strong>Total Milk Delivered:</strong> {{ total_litres }} Litres</div>
+                <div><strong>Pending Payment:</strong> KSh {{ unpaid_amount|floatformat:2 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milk Delivery Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="text-center" style="color: #333;">Milk Delivery Trend</h5>
+            <div class="chart-container" style="position: relative; height:40vh; width:100%">
+                <canvas id="milkChart"></canvas>
             </div>
         </div>
     </div>
 
     <!-- Milk Delivery History -->
     <div class="row mb-5">
-        <div class="col">
-            <h4 style="color: #333;">My Milk Deliveries</h4>
+        <div class="col-12">
+            <h5 class="text-center" style="color: #333;">My Milk Deliveries</h5>
             {% if deliveries %}
                 <div class="table-responsive">
-                    <table class="table table-bordered table-sm table-hover">
+                    <table class="table table-bordered table-sm table-hover text-nowrap">
                         <thead class="table-light">
                             <tr>
                                 <th>Date</th>
@@ -54,9 +64,44 @@
                     </table>
                 </div>
             {% else %}
-                <p>No milk deliveries found.</p>
+                <p class="text-center">No milk deliveries found.</p>
             {% endif %}
         </div>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('milkChart').getContext('2d');
+    const milkChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Litres Delivered',
+                data: {{ chart_data|safe }},
+                borderWidth: 2,
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
