@@ -1,0 +1,44 @@
+{% extends 'farmer/layouts/farmer-base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>My Vet Service Requests</h2>
+
+  <a href="{% url 'veterinary:request_vet_service' %}" class="btn btn-success mb-3">New Request</a>
+
+  {% if vet_requests %}
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Requested On</th>
+          <th>Appointment</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in vet_requests %}
+        <tr>
+          <td>{{ request.service_type.name }}</td>
+          <td>{{ request.request_date|date:"M d, Y H:i" }}</td>
+          <td>{{ request.appointment_date|default:"Not set" }}</td>
+          <td>
+            {% if request.status == 'PENDING' %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif request.status == 'APPROVED' %}
+              <span class="badge bg-primary">Approved</span>
+            {% elif request.status == 'COMPLETED' %}
+              <span class="badge bg-success">Completed</span>
+            {% else %}
+              <span class="badge bg-danger">Cancelled</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">You have no vet service requests yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

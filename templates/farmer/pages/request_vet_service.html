@@ -1,0 +1,20 @@
+{% extends 'farmer/layouts/farmer-base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Request Veterinary Service</h2>
+  <form method="post" class="mt-3">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.service_type.label_tag }} {{ form.service_type }}
+    </div>
+    <div class="mb-3">
+      {{ form.description.label_tag }} {{ form.description }}
+    </div>
+    <div class="mb-3">
+      {{ form.appointment_date.label_tag }} {{ form.appointment_date }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+  </form>
+</div>
+{% endblock %}
