@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Fresh Milk Ltd {% block title %}{% endblock %}</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  {% include 'includes/styles.html' %}
+</head>
+
+<body>
+  {% include 'farmer/includes/navbar.html' %}
+  {% include 'customer/includes/sidebar.html' %}
+
+  <main id="main" class="main">
+    {% include 'components/messages.html' %}
+    {% block content %}{% endblock %}
+  </main><!-- End #main -->
+  {% include 'includes/footer.html' %}
+  {% include 'includes/scripts.html' %}
+</body>
+
+</html>

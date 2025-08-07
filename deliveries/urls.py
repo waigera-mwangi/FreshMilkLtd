@@ -4,6 +4,6 @@ from . import views
 app_name = 'deliveries'
 
 urlpatterns = [
-    # path('', views.index, name='index'),
-    # Add more routes as needed
-]
+    path('dashboard/', views.view_deliveries, name='view-deliveries'),
+    
+    ]

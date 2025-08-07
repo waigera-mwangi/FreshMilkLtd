@@ -18,7 +18,7 @@ urlpatterns = [
     path('field_agent/', views.field_agent, name='field_agent'),
     path('field_manager/', views.field_manager, name='field_manager'),
     path('veterinary/', views.veterinary, name='veterinary'),
-    
+
  
        # profile
     # path('farmer-profile', customer_profile, name='farmer-profile'),

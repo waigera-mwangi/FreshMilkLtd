@@ -20,15 +20,17 @@ from django.urls import path, include, reverse_lazy
 from django.views.generic import TemplateView
 from accounts.decorators import required_access
 from django.contrib.auth import views as auth_views
-
+from accounts.views import loginView
 from FreshMilkLtd import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
-    path('deliveries/', include(('deliveries.urls', 'deliveries'), namespace='deliveries')),
-    path('payments/', include(('payments.urls', 'payments'), namespace='payments')),
-    path('veterinary/', include(('veterinary.urls', 'veterinary'), namespace='veterinary')),
+    path('', include('accounts.urls')),
+    path('', include('deliveries.urls')),
+    path('', include('payments.urls')),
+    path('', include('veterinary.urls')),
+    
+    
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

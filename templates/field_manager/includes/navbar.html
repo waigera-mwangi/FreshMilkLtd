@@ -8,7 +8,7 @@
     <div class="d-flex align-items-center justify-content-between">
       <a href="{% url 'accounts:service_provider' %}" class="logo d-flex align-items-center">
 {#        <img src="#" alt="">#}
-        <span class="d-none d-lg-block">Truck City Ltd</span>
+        <span class="d-none d-lg-block">Fresh Milk Ltd</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
@@ -27,8 +27,8 @@
 
 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
   {% if request.user.is_authenticated %}
-    {% if request.user.customer_profile.image %}
-      <img class="rounded-circle" src="{{ request.user.customer_profile.image.url }}" alt="Profile Picture">
+    {% if request.user.farmer_profile.image %}
+      <img class="rounded-circle" src="{{ request.user.farmer_profile.image.url }}" alt="Profile Picture">
     {% else %}
       <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default">
     {% endif %}
@@ -50,7 +50,7 @@
             <li class="dropdown-header">
               <h6>{{ request.user.get_full_name|title }}</h6>
          <small class="text-muted" >Hello {{user.get_user_type_display}}!</small>
-<!-- {#              <span>Customer</span>#} -->
+<!-- {#              <span>farmer</span>#} -->
             </li>
             <li>
               <hr class="dropdown-divider">

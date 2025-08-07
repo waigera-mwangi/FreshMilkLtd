@@ -1,0 +1,8 @@
+{% load widget_tweaks %}
+{% for field in form %}
+    <div class="col-12">
+      <label class="form-label">{{field.label}}</label>
+      {% render_field field class+="form-control" placeholder=field.label %}
+      <div class="text-danger">{{ field.errors }}</div>
+    </div>
+{% endfor %}

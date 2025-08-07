@@ -26,7 +26,7 @@ class LogoutView(View):
     
 class UserCreateView(SuccessMessageMixin, CreateView):
     template_name = "accounts/farmer-register.html"
-    form_class = CustomerSignUpForm
+    form_class = farmerSignUpForm
     model = User
     success_message = "You've registered successfully"
     success_url = reverse_lazy('accounts:login')

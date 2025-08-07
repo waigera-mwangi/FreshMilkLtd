@@ -1,33 +1,93 @@
 {% extends 'layouts/base-auth.html' %}
+{% load static %}
 
 {% block content %}
 <div class="card-body">
 
   <div class="logo-container">
-    {% load static %}
-    <img class="rounded-circle logo-img" src="{% static 'assets/img/truck-city.png' %}" alt="Logo" style="width: 100px; height: auto;">
-
-    <h3 class="logo-heading">Truck City Ltd</h3>
+    <img class="rounded-circle logo-img" src="{% static 'assets/img/fresh-milk.png' %}" alt="Logo" style="width: 100px; height: auto;">
+    <h3 class="logo-heading">Fresh Milk Ltd</h3>
   </div>
 
   <form class="login-form" method="post">
     {% csrf_token %}
 
-    {% include 'components/form-errors.html' with form=form %}
-    {% include 'components/form.html' with form=form %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
 
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <!-- Username Field -->
+    <div class="form-group">
+      <label for="{{ form.username.id_for_label }}">Username</label>
+      <input
+        type="text"
+        name="{{ form.username.name }}"
+        id="{{ form.username.id_for_label }}"
+        class="form-control"
+        value="{{ form.username.value|default:'' }}"
+        required
+      />
+      {% if form.username.errors %}
+        <div class="text-danger small">
+          {{ form.username.errors }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Password Field -->
+    <div class="form-group">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      <div class="input-group">
+        <input
+          type="password"
+          name="{{ form.password.name }}"
+          id="password"
+          class="form-control"
+          required
+        />
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+            Show
+          </button>
+        </div>
+      </div>
+      {% if form.password.errors %}
+        <div class="text-danger small">
+          {{ form.password.errors }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Remember Me -->
+    <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+      <label class="form-check-label" for="rememberMe">Remember Me</label>
+    </div>
+
+    <!-- Submit Button -->
     <div class="form-group">
       <button class="btn btn-primary btn-login" type="submit">Login</button>
     </div>
+
     <div class="form-group text-center">
       <p class="small mb-0">Need an account? <a href="{% url 'accounts:register' %}">Register here</a></p>
     </div>
+
     <div class="form-group text-center">
-      <p class="small mb-0">Forgot password?<a href="#">Click to reset</a></p>
+      <p class="small mb-0">Forgot password? <a href="#">Click to reset</a></p>
     </div>
   </form>
 </div>
 
+<!-- Style -->
 <style>
   .card-body {
     padding: 40px;
@@ -46,16 +106,9 @@
     border-radius: 50%;
   }
 
-  .logo-img {
-    max-width: 200px;
-    height: auto;
-  }
-
   .logo-heading {
     font-size: 24px;
-    {% comment %} margin-top: 0px; {% endcomment %}
     border-radius: 30%;
-    {% comment %} background-color: #A9A9A9; {% endcomment %}
     color: #000;
     padding: 0px;
     width: fit-content;
@@ -83,7 +136,6 @@
     width: auto;
     display: block;
     margin: 0 auto;
-    
   }
 
   .btn-login:hover {
@@ -98,4 +150,19 @@
     color: #007bff;
   }
 </style>
+
+<!-- Password Toggle Script -->
+<script>
+  document.getElementById("togglePassword").addEventListener("click", function () {
+    const passwordField = document.getElementById("password");
+    const type = passwordField.getAttribute("type");
+    if (type === "password") {
+      passwordField.setAttribute("type", "text");
+      this.innerText = "Hide";
+    } else {
+      passwordField.setAttribute("type", "password");
+      this.innerText = "Show";
+    }
+  });
+</script>
 {% endblock %}

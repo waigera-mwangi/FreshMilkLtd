@@ -15,8 +15,8 @@
           <th scope="col">Booking Date</th>
           <th scope="col">Tools Required</th>
           <th scope="col">Service Delivered</th>
-          <th scope="col">Customer Feedback</th>
-          <th scope="col">Customer Approval</th>
+          <th scope="col">farmer Feedback</th>
+          <th scope="col">farmer Approval</th>
         </tr>
       </thead>
       <tbody>
@@ -29,8 +29,8 @@
           <td>{{ booking.booking_date }}</td>
           <td>{{ booking.tools_required|default:"N/A" }}</td>
           <td>{{ booking.service_delivered|yesno:"Yes,No" }}</td>
-          <td>{{ booking.customer_feedback|default:"No feedback provided" }}</td>
-          <td>{{ booking.customer_approval|yesno:"Approved,Rejected,Pending" }}</td>
+          <td>{{ booking.farmer_feedback|default:"No feedback provided" }}</td>
+          <td>{{ booking.farmer_approval|yesno:"Approved,Rejected,Pending" }}</td>
         </tr>
         {% empty %}
         <tr>
