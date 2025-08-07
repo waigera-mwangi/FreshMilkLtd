@@ -9,7 +9,7 @@ from django.views.generic import CreateView
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import ListView, DetailView
 from django.contrib.messages.views import SuccessMessageMixin
-
+from django.contrib.auth.forms import AuthenticationForm
 from accounts.models import User
 from accounts.models import *
 from accounts.forms import *
@@ -48,15 +48,19 @@ def loginView(request):
                     if user.user_type == "FR":
                         login(request, user)
                         return redirect('accounts:farmer')
+                    
                     elif user.user_type == "FM":
                         login(request, user)
                         return redirect('accounts:finance_manager')
+                    
                     elif user.user_type == "FA":
                         login(request, user)
                         return redirect('accounts:field_agent')
+                    
                     elif user.user_type == "FD":
                         login(request, user)
                         return redirect('accounts:field_manager')
+                    
                     elif user.user_type == "VO":
                         login(request, user)
                         return redirect('accounts:veterinary_officer')
@@ -70,6 +74,9 @@ def loginView(request):
 # results
 
     return render(request, 'accounts/user-login.html', {'form': loginform, 'msg': msg})
+
+
+
 # farmer
 @required_access(login_url=reverse_lazy('accounts:login'), user_type="FR")
 def farmer(request):

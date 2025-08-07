@@ -18,11 +18,19 @@ class UserAdminChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'username', 'phone_number', 'town', 'location', 'is_active']
+        fields = ['first_name', 'last_name', 'email', 'username', 'phone_number',
+                  'town', 'location', 'user_type', 'is_active']
 
     def clean_password(self):
         # Return the initial password value regardless of user input
         return self.initial["password"]
+    
+    def clean_user_type(self):
+        user_type = self.cleaned_data.get('user_type')
+        if not user_type:
+            raise forms.ValidationError("User type is required.")
+        return user_type
+
 
 
 # -------------------
@@ -75,13 +83,9 @@ class FarmerSignUpForm(UserCreationForm):
 # Custom Authentication Form
 # -------------------
 class FarmerAuthenticationForm(AuthenticationForm):
-    """
-    Custom login validation to prevent certain roles from using customer login.
-    """
     def clean(self):
         super().clean()
-        if self.user_cache is not None and (
-            self.user_cache.is_staff or self.user_cache.user_type in ["FM", "FD", "VO", "AD"]
-        ):
-            logout(self.request)
-            raise forms.ValidationError('Invalid Username or Password', code='invalid_login')
+        if self.user_cache is not None:
+            if self.user_cache.is_superuser:
+                logout(self.request)
+                raise forms.ValidationError("Admins must log in through the admin panel.", code='invalid_login')
