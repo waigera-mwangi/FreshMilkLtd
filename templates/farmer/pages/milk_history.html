@@ -1,0 +1,50 @@
+{% extends 'farmer/layouts/farmer-base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Milk Delivery History</h2>
+
+  {% if deliveries %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Quantity (L)</th>
+            <th scope="col">Price/Litre</th>
+            <th scope="col">Total</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for delivery in deliveries %}
+          <tr>
+            <td>{{ delivery.collection_date|date:"M d, Y" }}</td>
+            <td>{{ delivery.quantity_liters|floatformat:2 }}</td>
+            <td>KSh {{ delivery.price_per_liter|floatformat:2|intcomma }}</td>
+            <td>KSh {{ delivery.total_amount|floatformat:2|intcomma }}</td>
+            <td>
+              {% if delivery.is_paid %}
+                <span class="badge bg-success">Paid</span>
+              {% else %}
+                <span class="badge bg-danger">Unpaid</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="table-secondary">
+            <td colspan="3" class="text-end fw-bold">Grand Total</td>
+            <td colspan="2" class="fw-bold">KSh {{ grand_total|floatformat:2|intcomma }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">No milk deliveries found.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ from .models import MilkCollection
 from django.db.models import Sum
 from django.utils.dateformat import DateFormat
 from collections import defaultdict
+from decimal import Decimal
+
 
 @login_required
 def view_deliveries(request):
@@ -37,3 +39,23 @@ def view_deliveries(request):
     }
 
     return render(request, 'farmer/pages/farmer_dashboard.html', context)
+
+#  farmer view milk history
+
+@login_required
+def milk_history(request):
+    farmer = request.user
+    deliveries = MilkCollection.objects.filter(farmer=farmer).order_by('-collection_date')
+    
+    grand_total = Decimal(0)
+    for delivery in deliveries:
+        quantity = Decimal(delivery.quantity_liters)
+        price = Decimal(delivery.price_per_liter)
+        delivery.total_amount = quantity * price
+        grand_total += delivery.total_amount
+
+    context = {
+        'deliveries': deliveries,
+        'grand_total': grand_total,
+    }
+    return render(request, 'farmer/pages/milk_history.html', context)

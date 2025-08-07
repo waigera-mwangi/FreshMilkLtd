@@ -5,5 +5,6 @@ app_name = 'deliveries'
 
 urlpatterns = [
     path('dashboard/', views.view_deliveries, name='view-deliveries'),
+     path('milk-history/', views.milk_history, name='milk_history'),
     
     ]
