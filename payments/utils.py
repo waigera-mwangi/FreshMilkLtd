@@ -2,6 +2,8 @@ import uuid
 from decimal import Decimal
 from deliveries.models import MilkCollection
 from payments.models import Payment, MilkPrice
+from django.db.models import Sum
+
 
 def calculate_and_create_payment(farmer, start_date, end_date):
     # Fetch unpaid milk collections for the farmer
@@ -20,7 +22,7 @@ def calculate_and_create_payment(farmer, start_date, end_date):
         raise ValueError("No active milk price set.")
 
     # Calculate total liters
-    total_liters = milk_collections.aggregate(total=models.Sum('quantity_liters'))['total'] or Decimal('0.00')
+    total_liters = milk_collections.aggregate(total=Sum('quantity_liters'))['total'] or Decimal('0.00')
     amount = total_liters * active_price.price_per_liter
 
     # Create payment
