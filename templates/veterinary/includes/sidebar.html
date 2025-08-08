@@ -24,7 +24,7 @@
 
     <!-- Treatment Records -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'veterinary:vet_treatment_records' %}">
+      <a class="nav-link collapsed" href="{% url 'veterinary:treatment_record_list' %}">
         <i class="bi bi-journal-medical"></i>
         <span>Treatment Records</span>
       </a>
@@ -32,23 +32,17 @@
 
     <!-- My Schedule -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'veterinary:vet_schedule' %}">
+      <a class="nav-link collapsed" href="{% url 'veterinary:assigned_requests' %}">
         <i class="bi bi-clock-history"></i>
         <span>My Schedule</span>
       </a>
     </li>
 
-    <!-- Feedback -->
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:service_feedback' %}">
-        <i class="bi bi-chat-left-text"></i>
-        <span>Feedback</span>
-      </a>
-    </li>
+  
 
     <!-- FAQs -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:service-faq' %}">
+      <a class="nav-link collapsed" href="{% url 'support:faq' %}">
         <i class="bi bi-question-circle"></i>
         <span>F.A.Q</span>
       </a>

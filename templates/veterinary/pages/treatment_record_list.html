@@ -1,0 +1,38 @@
+{% extends 'veterinary/layouts/vet-base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Treatment Records</h2>
+
+    {% if treatment_records %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Farmer Name</th>
+                    <th>Animal Type</th>
+                    <th>Service Type</th>
+                    <th>Treatment Date</th>
+                    <th>Treatment Details</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in treatment_records %}
+                <tr>
+                    <td>{{ record.service_request.farmer.get_full_name|default:record.service_request.farmer.username }}</td>
+                    <td>{{ record.service_request.animal_type }}</td>
+                    <td>{{ record.service_request.service_type.name }}</td>
+                    <td>{{ record.treatment_date|date:"M d, Y" }}</td>
+                    <td>{{ record.treatment_details }}</td>
+                    <td>{{ record.cost|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No treatment records found.</div>
+    {% endif %}
+</div>
+{% endblock %}

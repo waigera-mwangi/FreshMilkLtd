@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 
 def faq_list(request):
     faqs = FAQ.objects.all()
-    return render(request, 'farmer/support/faq.html', {'faqs': faqs})
+    return render(request, 'support/faq.html', {'faqs': faqs})
 
 @login_required
 def submit_feedback(request):
@@ -19,8 +19,8 @@ def submit_feedback(request):
     else:
         form = FeedbackForm()
     
-    return render(request, 'farmer/support/feedback.html', {'form': form})
+    return render(request, 'support/feedback.html', {'form': form})
 
 def thank_you(request):
-    return render(request, 'farmer/support/thank_you.html')
+    return render(request, 'support/thank_you.html')
 

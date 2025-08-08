@@ -46,6 +46,12 @@ def vet_dashboard(request):
     }
     return render(request, 'veterinary/pages/index.html', context)
 
+@login_required
+def vet_service_requests(request):
+    vet_requests = VetServiceRequest.objects.filter(vet_officer=request.user)
+    return render(request, 'veterinary/pages/vet_requests.html', {
+        'vet_requests': vet_requests
+    })
 
 @login_required
 def assigned_requests(request):

@@ -1,0 +1,30 @@
+{% extends 'veterinary/layouts/vet-base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Update Service Request</h2>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="card shadow-sm p-4">
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small">
+                    {{ field.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'veterinary:vet_service_requests' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

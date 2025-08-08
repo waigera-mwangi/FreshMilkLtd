@@ -15,5 +15,6 @@ urlpatterns = [
     path('request/<int:pk>/update/', views.update_request, name='update_request'),
     path('request/<int:pk>/treatment/', views.add_treatment_record, name='add_treatment_record'),
     path('treatment-records/', views.treatment_record_list, name='treatment_record_list'),
+    path('vet-service-requests/', views.vet_service_requests, name='vet_service_requests'),
 
 ]

@@ -1,0 +1,65 @@
+{% extends 'veterinary/layouts/vet-base.html' %}
+{% load static %}
+
+{% block title %}Vet Appointments{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Vet Appointments</h5>
+        </div>
+        <div class="card-body">
+            {% if vet_requests %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Farmer Name</th>
+                            <th>Animal Type</th>
+                            <th>Service Type</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in vet_requests %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ req.farmer.get_full_name|default:req.farmer.username }}</td>
+                            <td>{{ req.animal_type }}</td>
+                            <td>{{ req.service_type.name }}</td>
+                            <td>{{ req.request_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if req.status == "Pending" %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif req.status == "In Progress" %}
+                                    <span class="badge bg-info text-dark">In Progress</span>
+                                {% elif req.status == "Completed" %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ req.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'veterinary:vet_treatment_record_create' req.id %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Record Treatment
+                                </a>
+                                <a href="{% url 'veterinary:vet_request_detail' req.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No vet appointments assigned to you.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
