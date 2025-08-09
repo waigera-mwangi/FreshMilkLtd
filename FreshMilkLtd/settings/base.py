@@ -73,7 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',                
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -132,15 +132,14 @@ DEFAULT_CURRENCY = 'KES'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# Static files directories specify additional directories from which Django should collect static files
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+if DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / 'static',  # only for dev
+    ]
+
 
 MEDIA_URL = '/media/'
 # Path where media is stored
