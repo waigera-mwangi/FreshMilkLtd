@@ -1,61 +1,70 @@
-{% extends 'driver/layouts/driver-base.html' %}
-{% block title %}Home{% endblock %}
+{% extends 'field_agent/layouts/field_agent-base.html' %}
+{% block title %}Field Agent Dashboard{% endblock %}
 {% block content %}
-    <div class="pagetitle">
-      <h1>Dashboard</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{% url 'accounts:driver' %}">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
+<div class="pagetitle">
+  <h1>Field Agent Dashboard</h1>
+</div>
 
-    <section class="section dashboard">
-      <div class="row">
+<section class="section dashboard">
+  <div class="row">
 
-        <!-- Left side columns -->
-        <div class="col-lg-8">
-          <div class="row">
-
-            <!-- Orders Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card sales-card">
-                <div class="card-body">
-                  <h5 class="card-title">Approved Orders</h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="fa fa-shopping-bag"></i>
-                    </div>
-                    <div class="ps-3">
-                      <a href="#">
-                      <h6>{{approved}}</h6>
-                    </a>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div><!-- End Orders Card -->
-
-            <!-- Orders Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card sales-card">
-                <div class="card-body">
-                  <h5 class="card-title">Deliveries</h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="fa fa-truck"></i>
-                    </div>
-                    
-                  </div>
-                </div>
-
-              </div>
-            </div><!-- End Orders Card -->
-                  
+    <!-- Milk Collection Card -->
+    <div class="col-xxl-4 col-md-6">
+      <div class="card info-card">
+        <div class="card-body">
+          <h5 class="card-title">Milk Collected (Litres)</h5>
+          <div class="d-flex align-items-center">
+            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+              <i class="fa fa-tint"></i>
+            </div>
+            <div class="ps-3">
+              <h6>{{ milk_collected }}</h6>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
-    {% endblock %}
+    </div>
+
+    <!-- Chart -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Milk Collection (Last 7 Days)</h5>
+          <canvas id="milkChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('milkChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: 'Litres Collected',
+            data: {{ chart_data|safe }},
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true },
+        },
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}

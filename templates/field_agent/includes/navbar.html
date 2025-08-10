@@ -1,0 +1,80 @@
+{% load static %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<header id="header" class="header fixed-top d-flex align-items-center">
+
+  <!-- Logo & Sidebar Toggle -->
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="{% url 'accounts:farmer' %}" class="logo d-flex align-items-center">
+      <span class="d-none d-lg-block">Fresh Milk Ltd</span>
+    </a>
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <form method="get" class="d-flex">
+      <input 
+        type="search" 
+        class="form-control me-2" 
+        placeholder="Search..." 
+        aria-label="Search" 
+        name="q" 
+        value="{{ request.GET.q|default:'' }}">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+  </div>
+
+  <!-- Right Side Navigation -->
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
+
+      <!-- Mobile Search Icon -->
+      <li class="nav-item d-block d-lg-none">
+        <a class="nav-link nav-icon search-bar-toggle" href="#">
+          <i class="bi bi-search"></i>
+        </a>
+      </li>
+
+      <!-- User Profile -->
+      <li class="nav-item dropdown pe-3">
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          {% if request.user.is_authenticated and request.user.farmer_profile.image %}
+            <img class="rounded-circle" src="{{ request.user.farmer_profile.image.url }}" alt="Profile Picture">
+          {% else %}
+            <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default Picture">
+          {% endif %}
+        </a>
+
+        <!-- Dropdown Menu -->
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header text-center">
+            <h6>{{ request.user.get_full_name|default:request.user.username|title }}</h6>
+            {% if request.user.is_authenticated %}
+              <small class="text-muted">Hello {{ request.user.get_user_type_display|default:"User" }}!</small>
+            {% endif %}
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*">
+              <i class="bi bi-person"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</header>

@@ -53,6 +53,8 @@ class TimeStamp(models.Model):
 # -------------------
 # Custom User Model
 # -------------------
+from django.utils.crypto import get_random_string
+
 class User(AbstractUser):
     class UserTypes(models.TextChoices):
         FARMER = 'FR', _('Farmer')
@@ -65,6 +67,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = CustomPhoneNumberField(unique=True, null=True)
     user_type = models.CharField(max_length=2, choices=UserTypes.choices, default=UserTypes.FARMER)
+    farmer_id = models.CharField(max_length=10, unique=True, null=True, blank=True)  # NEW FIELD
     town = models.CharField(max_length=50, blank=True)
     location = models.CharField(max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
@@ -84,8 +87,20 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if self.username:
             self.username = self.username.lower()
+        
+        # Auto-generate Farmer ID for Farmers if not set
+        if self.user_type == self.UserTypes.FARMER and not self.farmer_id:
+            self.farmer_id = self.generate_farmer_id()
+        
         super().save(*args, **kwargs)
-    
+
+    def generate_farmer_id(self):
+        """Generate a unique Farmer ID like FRM12345"""
+        while True:
+            new_id = get_random_string(5, allowed_chars='0123456789')  # numeric only
+            if not User.objects.filter(farmer_id=new_id).exists():
+                return new_id
+
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
