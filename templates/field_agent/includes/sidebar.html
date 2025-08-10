@@ -1,0 +1,39 @@
+<aside id="layout-menu" class="sidebar">
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'accounts:field_agent' %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <!-- Milk Collection -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'deliveries:record_collection' %}">
+        <i class="fas fa-cow"></i>
+        <span>Milk Collection</span>
+      </a>
+    </li>
+
+  
+    <!-- Reports -->
+    <li class="nav-item">
+      <a class="nav-link" href="*">
+        <i class="fas fa-file-alt"></i>
+        <span>Reports</span>
+      </a>
+    </li>
+
+    <!-- Support -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'support:feedback' %}">
+        <i class="fas fa-paper-plane"></i>
+        <span>Send Feedback</span>
+      </a>
+    </li>
+
+
+  </ul>
+</aside>

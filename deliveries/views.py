@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import MilkCollection
 from django.db.models import Sum
@@ -8,8 +8,10 @@ from decimal import Decimal
 from django.template.loader import get_template
 from django.http import HttpResponse
 from xhtml2pdf import pisa
-
-
+from .forms import *
+from django.contrib import messages
+from datetime import date
+from django.db import models
 @login_required
 def view_deliveries(request):
     farmer = request.user
@@ -116,3 +118,84 @@ def export_milk_history_pdf(request):
     if pisa_status.err:
         return HttpResponse('PDF generation failed')
     return response
+
+#  field agent views
+def dashboard(request):
+    # Total milk collected
+    milk_collected = MilkCollection.objects.aggregate(total=Sum('quantity'))['total'] or 0
+
+    # Milk collected per day for the last 7 days (for graph)
+    last_7_days = (
+        MilkCollection.objects
+        .filter(collection_date__gte=date.today() - timedelta(days=6))
+        .values('collection_date')
+        .annotate(total=Sum('quantity'))
+        .order_by('collection_date')
+    )
+
+    labels = [entry['collection_date'].strftime("%b %d") for entry in last_7_days]
+    data = [entry['total'] for entry in last_7_days]
+
+    return render(request, 'field_agent/dashboard.html', {
+        'milk_collected': milk_collected,
+        'chart_labels': labels,
+        'chart_data': data,
+    })
+# login_required
+# def dashboard(request):
+#     today_date = date.today()  # current date
+
+#     collections_today = MilkCollection.objects.filter(
+#         collection_date__date=today_date
+#     )
+
+#     context = {
+#         "collections_today": collections_today,
+#         "total_today": collections_today.aggregate(total=models.Sum("quantity_collected"))["total"] or 0,
+#     }
+#     return render(request, "deliveries/field_agent_dashboard.html", context)
+
+@login_required
+def milk_collection_list(request):
+    collections = MilkCollection.objects.all().order_by('-collection_date')
+    return render(request, 'field_agent/milk_collection_list.html', {'collections': collections})
+
+@login_required
+def record_collection(request):
+    if request.method == "POST":
+        form = MilkCollectionForm(request.POST)
+        if form.is_valid():
+            collection = form.save(commit=False)
+            collection.field_agent = request.user  # auto-assign logged-in agent
+            collection.save()
+            messages.success(request, "Milk collection recorded successfully.")
+            return redirect('collection_list')
+    else:
+        form = MilkCollectionForm()
+    return render(request, 'field_agent/pages/record_collection.html', {'form': form})
+
+
+# farmer name
+from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+
+@login_required
+def get_farmer_name(request):
+    farmer_id = request.GET.get('farmer_id')
+    User = get_user_model()
+    try:
+        farmer = User.objects.get(farmer_id=farmer_id, user_type='FR')
+        return JsonResponse({'name': farmer.get_full_name()})
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Farmer not found'}, status=404)
+
+
+# @login_required
+# def farmers_list(request):
+#     farmers = Farmer.objects.all()
+#     return render(request, 'field_agent/farmers_list.html', {'farmers': farmers})
+
+# @login_required
+# def farmer_detail(request, pk):
+#     farmer = get_object_or_404(Farmer, pk=pk)
+#     return render(request, 'field_agent/farmer_detail.html', {'farmer': farmer})

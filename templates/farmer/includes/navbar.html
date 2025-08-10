@@ -9,7 +9,7 @@
       <span class="d-none d-lg-block">Fresh Milk Ltd</span>
     </a>
     <i class="bi bi-list toggle-sidebar-btn"></i>
-  </div><!-- End Logo -->
+  </div>
 
   <!-- Search Bar -->
   <div class="search-bar">
@@ -23,7 +23,7 @@
   <nav class="header-nav ms-auto">
     <ul class="d-flex align-items-center">
 
-      <!-- Search Icon (for mobile) -->
+      <!-- Search Icon (mobile) -->
       <li class="nav-item d-block d-lg-none">
         <a class="nav-link nav-icon search-bar-toggle" href="#">
           <i class="bi bi-search"></i>
@@ -44,7 +44,10 @@
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
           <li class="dropdown-header">
             <h6>{{ request.user.get_full_name|title }}</h6>
-            <small class="text-muted">Hello {{ user.get_user_type_display }}!</small>
+            {% if request.user.farmer_id %}
+              <small class="text-muted">Farmer ID: {{ request.user.farmer_id }}</small><br>
+            {% endif %}
+            <small class="text-muted">Hello {{ request.user.get_user_type_display }}!</small>
           </li>
 
           <li><hr class="dropdown-divider"></li>
@@ -64,13 +67,8 @@
               <span>Sign Out</span>
             </a>
           </li>
-
         </ul>
-        <!-- End Dropdown -->
       </li>
-      <!-- End Profile Nav -->
-
     </ul>
-  </nav><!-- End Icons Navigation -->
-
-</header><!-- End Header -->
+  </nav>
+</header>
