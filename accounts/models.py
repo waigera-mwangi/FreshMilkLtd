@@ -97,7 +97,7 @@ class User(AbstractUser):
     def generate_farmer_id(self):
         """Generate a unique Farmer ID like FRM12345"""
         while True:
-            new_id = f"FRM{get_random_string(5, allowed_chars='0123456789')}"
+            new_id = get_random_string(5, allowed_chars='0123456789')  # numeric only
             if not User.objects.filter(farmer_id=new_id).exists():
                 return new_id
 
