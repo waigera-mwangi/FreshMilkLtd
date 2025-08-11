@@ -157,10 +157,6 @@ def dashboard(request):
     })
 
 
-@login_required
-def milk_collection_list(request):
-    collections = MilkCollection.objects.all().order_by('-collection_date')
-    return render(request, 'field_agent/milk_collection_list.html', {'collections': collections})
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -201,3 +197,7 @@ def record_collection(request):
 
     return render(request, 'field_agent/pages/record_collection.html', {'form': form})
 
+@login_required
+def milk_collection_list(request):
+    collections = MilkCollection.objects.all().order_by('-collection_date')
+    return render(request, 'field_agent/pages/milk_collection_list.html', {'collections': collections})
