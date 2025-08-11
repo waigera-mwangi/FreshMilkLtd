@@ -10,8 +10,8 @@ urlpatterns = [
     
     # field agent
     path('filed-agent-dashboard/', views.dashboard, name='field_agent_dashboard'),
-    path('record-collection/', views.record_collection, name='record_collection'),
     path('get-farmer-name/', views.get_farmer_name, name='get_farmer_name'),
+    path('record-collection/', views.record_collection, name='record_collection'),
     # path('milk-collection/', views.milk_collection_list, name='milk_collection_list'),
     # path('milk-collection/add/', views.milk_collection_create, name='milk_collection_create'),
     # path('farmers/', views.farmers_list, name='farmers_list'),

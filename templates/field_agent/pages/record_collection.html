@@ -1,21 +1,37 @@
-<form method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Record Collection</button>
+{% extends 'field_agent/layouts/field_agent-base.html' %}
+{% block title %}Milk Collection{% endblock %}
+{% block content %}
+<form id="milkForm" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
 </form>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).on('input', '#id_farmer_id', function() {
-    let farmerId = $(this).val();
-    if (farmerId) {
-        $.get("{% url 'deliveries:get_farmer_name' %}", { farmer_id: farmerId }, function(data) {
-            $('#id_farmer_name').val(data.name);
-        }).fail(function() {
-            $('#id_farmer_name').val('');
-        });
-    } else {
-        $('#id_farmer_name').val('');
-    }
+document.addEventListener("DOMContentLoaded", function () {
+    const farmerIdInput = document.getElementById("id_farmer_id");
+    const farmerNameInput = document.getElementById("id_farmer_name");
+    const form = document.getElementById("milkForm");
+
+    farmerIdInput.addEventListener("blur", function () {
+        const farmerId = farmerIdInput.value.trim();
+        if (farmerId) {
+            fetch(`/get-farmer-name/?farmer_id=${farmerId}`)
+                .then(res => res.json())
+                .then(data => {
+                    farmerNameInput.value = data.name || "";
+                });
+        }
+    });
+
+    form.addEventListener("submit", function () {
+        setTimeout(() => {
+            farmerIdInput.value = "";
+            farmerNameInput.value = "";
+            document.getElementById("id_quantity_liters").value = "";
+        }, 100); 
+    });
 });
 </script>
+
+{% endblock %}

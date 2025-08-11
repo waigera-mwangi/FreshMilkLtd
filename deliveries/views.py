@@ -12,6 +12,10 @@ from .forms import *
 from django.contrib import messages
 from datetime import date
 from django.db import models
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET, require_POST
+
 @login_required
 def view_deliveries(request):
     farmer = request.user
@@ -160,42 +164,39 @@ def milk_collection_list(request):
     collections = MilkCollection.objects.all().order_by('-collection_date')
     return render(request, 'field_agent/milk_collection_list.html', {'collections': collections})
 
-@login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_GET, require_POST
+from django.utils.timezone import now
+from .models import MilkCollection
+from .forms import MilkCollectionForm
+
+User = get_user_model()
+
+@require_GET
+def get_farmer_name(request):
+    farmer_id = request.GET.get("farmer_id", "").strip()
+    try:
+        farmer = User.objects.get(farmer_id=farmer_id, user_type=User.UserTypes.FARMER)
+        return JsonResponse({"name": farmer.get_full_name()})
+    except User.DoesNotExist:
+        return JsonResponse({"name": ""}, status=404)
+
+
 def record_collection(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = MilkCollectionForm(request.POST)
         if form.is_valid():
-            collection = form.save(commit=False)
-            collection.field_agent = request.user  # auto-assign logged-in agent
-            collection.save()
-            messages.success(request, "Milk collection recorded successfully.")
-            return redirect('collection_list')
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            return redirect('deliveries:record_collection')  # normal redirect for non-AJAX
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = MilkCollectionForm()
+
     return render(request, 'field_agent/pages/record_collection.html', {'form': form})
 
-
-# farmer name
-from django.http import JsonResponse
-from django.contrib.auth import get_user_model
-
-@login_required
-def get_farmer_name(request):
-    farmer_id = request.GET.get('farmer_id')
-    User = get_user_model()
-    try:
-        farmer = User.objects.get(farmer_id=farmer_id, user_type='FR')
-        return JsonResponse({'name': farmer.get_full_name()})
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'Farmer not found'}, status=404)
-
-
-# @login_required
-# def farmers_list(request):
-#     farmers = Farmer.objects.all()
-#     return render(request, 'field_agent/farmers_list.html', {'farmers': farmers})
-
-# @login_required
-# def farmer_detail(request, pk):
-#     farmer = get_object_or_404(Farmer, pk=pk)
-#     return render(request, 'field_agent/farmer_detail.html', {'farmer': farmer})

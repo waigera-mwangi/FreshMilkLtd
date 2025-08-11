@@ -27,11 +27,13 @@ class PickupLocation(models.Model):
 
 
 # Milk Collection
+from django.utils import timezone
+
 class MilkCollection(TimeStamp):
     farmer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        limit_choices_to={'user_type': 'FR'},  # Only Farmers
+        limit_choices_to={'user_type': 'FR'},
         related_name='milk_collections'
     )
     field_agent = models.ForeignKey(
@@ -39,7 +41,7 @@ class MilkCollection(TimeStamp):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        limit_choices_to={'user_type': 'FA'},  # Only Field Agents
+        limit_choices_to={'user_type': 'FA'},
         related_name='collected_milk'
     )
     pickup_location = models.ForeignKey(
@@ -52,20 +54,19 @@ class MilkCollection(TimeStamp):
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.10'))]
     )
-    collection_date = models.DateField()
+    collection_date = models.DateField(auto_now_add=True)
     price_per_liter = models.DecimalField(
-    max_digits=8,
-    decimal_places=2,
-    validators=[MinValueValidator(Decimal('0.10'))],
-    help_text="Price per liter at the time of collection"
-)
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.10'))],
+        help_text="Price per liter at the time of collection"
+    )
     is_paid = models.BooleanField(default=False)
     remarks = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Auto-set price if not already provided
         if not self.price_per_liter:
-            from payments.models import MilkPrice  # Import here to avoid circular import
+            from payments.models import MilkPrice
             active_price = MilkPrice.objects.filter(is_active=True).order_by('-effective_date').first()
             if active_price:
                 self.price_per_liter = active_price.price_per_liter
