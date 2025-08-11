@@ -70,7 +70,7 @@ class User(AbstractUser):
     farmer_id = models.CharField(max_length=10, unique=True, null=True, blank=True)  # NEW FIELD
     town = models.CharField(max_length=50, blank=True)
     location = models.CharField(max_length=50, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
 
     objects = CustomUserManager()
