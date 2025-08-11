@@ -12,6 +12,10 @@ from .forms import *
 from django.contrib import messages
 from datetime import date
 from django.db import models
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET, require_POST
+
 @login_required
 def view_deliveries(request):
     farmer = request.user
@@ -120,16 +124,26 @@ def export_milk_history_pdf(request):
     return response
 
 #  field agent views
-def dashboard(request):
-    # Total milk collected
-    milk_collected = MilkCollection.objects.aggregate(total=Sum('quantity'))['total'] or 0
+from datetime import date, timedelta
+from django.db.models import Sum
+from django.shortcuts import render
+from .models import MilkCollection
 
-    # Milk collected per day for the last 7 days (for graph)
+def dashboard(request):
+    # Filter by the logged-in field agent if you want personalized stats
+    milk_qs = MilkCollection.objects.all()
+    if request.user.is_authenticated and hasattr(request.user, 'user_type') and request.user.user_type == 'FIELD_AGENT':
+        milk_qs = milk_qs.filter(field_agent=request.user)
+
+    # Total milk collected
+    milk_collected = milk_qs.aggregate(total=Sum('quantity_liters'))['total'] or 0
+
+    # Milk collected per day for the last 7 days
     last_7_days = (
-        MilkCollection.objects
+        milk_qs
         .filter(collection_date__gte=date.today() - timedelta(days=6))
         .values('collection_date')
-        .annotate(total=Sum('quantity'))
+        .annotate(total=Sum('quantity_liters'))
         .order_by('collection_date')
     )
 
@@ -141,61 +155,49 @@ def dashboard(request):
         'chart_labels': labels,
         'chart_data': data,
     })
-# login_required
-# def dashboard(request):
-#     today_date = date.today()  # current date
 
-#     collections_today = MilkCollection.objects.filter(
-#         collection_date__date=today_date
-#     )
 
-#     context = {
-#         "collections_today": collections_today,
-#         "total_today": collections_today.aggregate(total=models.Sum("quantity_collected"))["total"] or 0,
-#     }
-#     return render(request, "deliveries/field_agent_dashboard.html", context)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
+from django.views.decorators.http import require_GET, require_POST
+from django.utils.timezone import now
+from .models import MilkCollection
+from .forms import MilkCollectionForm
+
+User = get_user_model()
+
+@require_GET
+def get_farmer_name(request):
+    farmer_id = request.GET.get("farmer_id", "").strip()
+    try:
+        farmer = User.objects.get(farmer_id=farmer_id, user_type=User.UserTypes.FARMER)
+        return JsonResponse({"name": farmer.get_full_name()})
+    except User.DoesNotExist:
+        return JsonResponse({"name": ""}, status=404)
+
+
+def record_collection(request):
+    if request.method == 'POST':
+        form = MilkCollectionForm(request.POST, request=request)
+        if form.is_valid():
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Milk collection recorded successfully!'
+                })
+            return redirect('deliveries:record_collection')  # normal redirect for non-AJAX
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = MilkCollectionForm()
+
+    return render(request, 'field_agent/pages/record_collection.html', {'form': form})
 
 @login_required
 def milk_collection_list(request):
     collections = MilkCollection.objects.all().order_by('-collection_date')
-    return render(request, 'field_agent/milk_collection_list.html', {'collections': collections})
-
-@login_required
-def record_collection(request):
-    if request.method == "POST":
-        form = MilkCollectionForm(request.POST)
-        if form.is_valid():
-            collection = form.save(commit=False)
-            collection.field_agent = request.user  # auto-assign logged-in agent
-            collection.save()
-            messages.success(request, "Milk collection recorded successfully.")
-            return redirect('collection_list')
-    else:
-        form = MilkCollectionForm()
-    return render(request, 'field_agent/pages/record_collection.html', {'form': form})
-
-
-# farmer name
-from django.http import JsonResponse
-from django.contrib.auth import get_user_model
-
-@login_required
-def get_farmer_name(request):
-    farmer_id = request.GET.get('farmer_id')
-    User = get_user_model()
-    try:
-        farmer = User.objects.get(farmer_id=farmer_id, user_type='FR')
-        return JsonResponse({'name': farmer.get_full_name()})
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'Farmer not found'}, status=404)
-
-
-# @login_required
-# def farmers_list(request):
-#     farmers = Farmer.objects.all()
-#     return render(request, 'field_agent/farmers_list.html', {'farmers': farmers})
-
-# @login_required
-# def farmer_detail(request, pk):
-#     farmer = get_object_or_404(Farmer, pk=pk)
-#     return render(request, 'field_agent/farmer_detail.html', {'farmer': farmer})
+    return render(request, 'field_agent/pages/milk_collection_list.html', {'collections': collections})
