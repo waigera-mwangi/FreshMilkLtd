@@ -124,16 +124,26 @@ def export_milk_history_pdf(request):
     return response
 
 #  field agent views
-def dashboard(request):
-    # Total milk collected
-    milk_collected = MilkCollection.objects.aggregate(total=Sum('quantity'))['total'] or 0
+from datetime import date, timedelta
+from django.db.models import Sum
+from django.shortcuts import render
+from .models import MilkCollection
 
-    # Milk collected per day for the last 7 days (for graph)
+def dashboard(request):
+    # Filter by the logged-in field agent if you want personalized stats
+    milk_qs = MilkCollection.objects.all()
+    if request.user.is_authenticated and hasattr(request.user, 'user_type') and request.user.user_type == 'FIELD_AGENT':
+        milk_qs = milk_qs.filter(field_agent=request.user)
+
+    # Total milk collected
+    milk_collected = milk_qs.aggregate(total=Sum('quantity_liters'))['total'] or 0
+
+    # Milk collected per day for the last 7 days
     last_7_days = (
-        MilkCollection.objects
+        milk_qs
         .filter(collection_date__gte=date.today() - timedelta(days=6))
         .values('collection_date')
-        .annotate(total=Sum('quantity'))
+        .annotate(total=Sum('quantity_liters'))
         .order_by('collection_date')
     )
 
@@ -145,19 +155,7 @@ def dashboard(request):
         'chart_labels': labels,
         'chart_data': data,
     })
-# login_required
-# def dashboard(request):
-#     today_date = date.today()  # current date
 
-#     collections_today = MilkCollection.objects.filter(
-#         collection_date__date=today_date
-#     )
-
-#     context = {
-#         "collections_today": collections_today,
-#         "total_today": collections_today.aggregate(total=models.Sum("quantity_collected"))["total"] or 0,
-#     }
-#     return render(request, "deliveries/field_agent_dashboard.html", context)
 
 @login_required
 def milk_collection_list(request):
@@ -186,11 +184,14 @@ def get_farmer_name(request):
 
 def record_collection(request):
     if request.method == 'POST':
-        form = MilkCollectionForm(request.POST)
+        form = MilkCollectionForm(request.POST, request=request)
         if form.is_valid():
             form.save()
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Milk collection recorded successfully!'
+                })
             return redirect('deliveries:record_collection')  # normal redirect for non-AJAX
         else:
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
