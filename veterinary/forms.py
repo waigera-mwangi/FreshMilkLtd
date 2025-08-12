@@ -24,7 +24,4 @@ class VetServiceRequestUpdateForm(forms.ModelForm):
 class VetTreatmentRecordForm(forms.ModelForm):
     class Meta:
         model = VetTreatmentRecord
-        fields = ['notes']
-        widgets = {
-            'notes': forms.Textarea(attrs={'rows': 4}),
-        }
+        fields = ['treatment_details', 'follow_up_date']  # ❌ remove 'notes'

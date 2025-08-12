@@ -17,4 +17,10 @@ urlpatterns = [
     path('treatment-records/', views.treatment_record_list, name='treatment_record_list'),
     path('vet-service-requests/', views.vet_service_requests, name='vet_service_requests'),
 
+    path('vet/claim/<int:request_id>/', views.claim_vet_request, name='claim_vet_request'),
+
+    path(
+        "treatment-record/create/<int:request_id>/",
+        views.vet_treatment_record_create,
+        name="vet_treatment_record_create",),
 ]

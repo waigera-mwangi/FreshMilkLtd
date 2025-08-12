@@ -64,9 +64,14 @@ class VetServiceRequest(models.Model):
 # Treatment Records (Optional)
 # -------------------------
 class VetTreatmentRecord(models.Model):
-    request = models.OneToOneField(VetServiceRequest, on_delete=models.CASCADE, related_name='treatment_record')
-    notes = models.TextField()
+    request = models.OneToOneField(
+        VetServiceRequest,
+        on_delete=models.CASCADE,
+        related_name='treatment_record'
+    )
+    treatment_details = models.TextField()
     completed_on = models.DateTimeField(auto_now_add=True)
+    follow_up_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"Treatment for {self.request.farmer.get_full_name()}"
+        return f"Treatment for {self.vet_request}"

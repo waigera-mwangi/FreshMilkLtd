@@ -1,0 +1,40 @@
+{% extends 'veterinary/layouts/vet-base.html' %}
+
+{% block title %}Vet Officer Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Record Treatment for Request #{{ service_request.id }}</h2>
+    <p>
+        <strong>Animal:</strong> {{ service_request.animal_name }}<br>
+        <strong>Service Type:</strong> {{ service_request.service_type.name }}<br>
+        <strong>Status:</strong> {{ service_request.status }}
+    </p>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+            <label for="{{ form.treatment_details.id_for_label }}" class="form-label">Treatment Details</label>
+            {{ form.treatment_details }}
+            {{ form.treatment_details.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.medications.id_for_label }}" class="form-label">Medications</label>
+            {{ form.medications }}
+            {{ form.medications.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.follow_up_date.id_for_label }}" class="form-label">Follow-up Date</label>
+            {{ form.follow_up_date }}
+            {{ form.follow_up_date.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Treatment Record</button>
+        <a href="{% url 'veterinary:vet_service_requests' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
