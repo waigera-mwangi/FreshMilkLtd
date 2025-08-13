@@ -20,7 +20,7 @@
                 {% for record in treatment_records %}
                 <tr>
                     <td>{{ record.service_request.farmer.get_full_name|default:record.service_request.farmer.username }}</td>
-                    <td>{{ record.service_request.animal_type }}</td>
+                
                     <td>{{ record.service_request.service_type.name }}</td>
                     <td>{{ record.treatment_date|date:"M d, Y" }}</td>
                     <td>{{ record.treatment_details }}</td>

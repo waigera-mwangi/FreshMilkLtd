@@ -168,11 +168,15 @@ def vet_treatment_record_create(request, request_id):
     
     
 
-login_required
-def treatment_record_list(request, request_id):
-    vet_request = get_object_or_404(VetServiceRequest, id=request_id)
-    records = VetTreatmentRecord.objects.filter(vet_request=vet_request)
-    return render(request, 'veterinary/pages/treatment_record_list.html', {
-        'vet_request': vet_request,
-        'records': records
-    })
+@login_required
+def treatment_record_list(request):
+    records = VetTreatmentRecord.objects.filter(
+    request__vet_officer=request.user,
+    
+    ).select_related('request')
+
+    return render(
+        request,
+        'veterinary/pages/treatment_record_list.html',
+        {'records': records}
+    )
