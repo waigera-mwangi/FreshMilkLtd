@@ -39,7 +39,7 @@
                     </td>
                     <td>
                         <a href="{% url 'veterinary:update_request' request.id %}" class="btn btn-sm btn-primary">Update</a>
-                        <a href="{% url 'veterinary:treatment_record_list' request.id %}" class="btn btn-sm btn-success">Treatment Records</a>
+                        <a href="{% url 'veterinary:treatment_record_list' %}" class="btn btn-sm btn-success">Treatment Records</a>
                     </td>
                 </tr>
                 {% endfor %}
