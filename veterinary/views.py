@@ -171,8 +171,8 @@ def vet_treatment_record_create(request, request_id):
 @login_required
 def treatment_record_list(request):
     records = VetTreatmentRecord.objects.filter(
-    request__vet_officer=request.user,
-    
+        request__vet_officer=request.user,  # assuming vet_officer is a FK to User in VetServiceRequest
+        completed_on__isnull=False
     ).select_related('request')
 
     return render(

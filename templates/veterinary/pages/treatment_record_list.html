@@ -2,36 +2,37 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Treatment Records</h2>
+    <h2 class="mb-4">Completed Treatment Records</h2>
 
-    {% if treatment_records %}
+    {% if records %}
     <div class="table-responsive">
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped align-middle">
             <thead class="table-dark">
                 <tr>
                     <th>Farmer Name</th>
                     <th>Service Type</th>
-                    <th>Treatment Date</th>
+                    <th>Completed On</th>
                     <th>Treatment Details</th>
-                    <th>Cost</th>
+                    <th>Follow-up Date</th>
                 </tr>
             </thead>
             <tbody>
-                {% for record in treatment_records %}
+                {% for record in records %}
                 <tr>
-                    <td>{{ record.service_request.farmer.get_full_name|default:record.service_request.farmer.username }}</td>
-                
-                    <td>{{ record.service_request.service_type.name }}</td>
-                    <td>{{ record.treatment_date|date:"M d, Y" }}</td>
+                    <td>
+                        {{ record.request.farmer.get_full_name|default:record.request.farmer.username }}
+                    </td>
+                    <td>{{ record.request.service_type.name }}</td>
+                    <td>{{ record.completed_on|date:"M d, Y" }}</td>
                     <td>{{ record.treatment_details }}</td>
-                    <td>{{ record.cost|floatformat:2 }}</td>
+                    <td>{{ record.follow_up_date|default:"N/A" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <div class="alert alert-info">No treatment records found.</div>
+    <div class="alert alert-info">No completed treatment records found.</div>
     {% endif %}
 </div>
 {% endblock %}

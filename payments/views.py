@@ -41,3 +41,109 @@ def export_payment_statements_pdf(request):
         return HttpResponse('Error generating PDF', status=500)
 
     return response
+
+
+# finance manager
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Sum, Count
+from django.utils import timezone
+from .models import MilkPrice, Payment
+from .forms import MilkPriceForm
+
+# Restrict to Finance Manager
+def is_finance_manager(user):
+    return user.is_authenticated and getattr(user, 'user_type', '') == 'FM'  # Assuming 'FM' for finance manager
+
+from django.db.models.functions import TruncMonth
+
+@login_required
+@user_passes_test(is_finance_manager)
+def finance_dashboard(request):
+    total_pending = Payment.objects.filter(status=Payment.PaymentStatus.PENDING).aggregate(total=Sum('amount'))['total'] or 0
+    paid_this_month = Payment.objects.filter(
+        status=Payment.PaymentStatus.PAID,
+        generated_on__month=timezone.now().month
+    ).aggregate(total=Sum('amount'))['total'] or 0
+    outstanding_farmers = Payment.objects.filter(status=Payment.PaymentStatus.PENDING).values('farmer').distinct().count()
+    active_milk_price = MilkPrice.objects.filter(is_active=True).first()
+
+    # Monthly paid amounts for chart
+    monthly_data = (
+        Payment.objects.filter(status=Payment.PaymentStatus.PAID)
+        .annotate(month=TruncMonth('generated_on'))
+        .values('month')
+        .annotate(total=Sum('amount'))
+        .order_by('month')
+    )
+
+    months = [item['month'].strftime('%b %Y') for item in monthly_data]
+    totals = [float(item['total']) for item in monthly_data]
+
+    # Pending vs Paid summary
+    paid_count = Payment.objects.filter(status=Payment.PaymentStatus.PAID).count()
+    pending_count = Payment.objects.filter(status=Payment.PaymentStatus.PENDING).count()
+
+    context = {
+        'total_pending': total_pending,
+        'paid_this_month': paid_this_month,
+        'outstanding_farmers': outstanding_farmers,
+        'active_milk_price': active_milk_price,
+        'months': months,
+        'totals': totals,
+        'paid_count': paid_count,
+        'pending_count': pending_count
+    }
+    return render(request, 'finance_manager/pages/dashboard.html', context)
+
+@login_required
+@user_passes_test(is_finance_manager)
+def milk_price_list(request):
+    prices = MilkPrice.objects.all()
+    return render(request, 'finance_manager/milk_price_list.html', {'prices': prices})
+
+
+@login_required
+@user_passes_test(is_finance_manager)
+def milk_price_create(request):
+    if request.method == 'POST':
+        form = MilkPriceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('finance_manager:milk_price_list')
+    else:
+        form = MilkPriceForm()
+    return render(request, 'finance_manager/milk_price_form.html', {'form': form})
+
+
+@login_required
+@user_passes_test(is_finance_manager)
+def payment_list(request):
+    payments = Payment.objects.select_related('farmer').order_by('-generated_on')
+    return render(request, 'finance_manager/pages/payment_list.html', {'payments': payments})
+
+
+@login_required
+@user_passes_test(is_finance_manager)
+def payment_detail(request, pk):
+    payment = get_object_or_404(Payment, pk=pk)
+    return render(request, 'finance_manager/payment_detail.html', {'payment': payment})
+
+
+@login_required
+@user_passes_test(is_finance_manager)
+def mark_payment_paid(request, pk):
+    payment = get_object_or_404(Payment, pk=pk)
+    payment.status = Payment.PaymentStatus.PAID
+    payment.save()
+    return redirect('payments:payment_list')
+
+
+@login_required
+@user_passes_test(is_finance_manager)
+def reports(request):
+    monthly_summary = Payment.objects.filter(status=Payment.PaymentStatus.PAID).extra(
+        select={'month': "strftime('%%m', generated_on)"}
+    ).values('month').annotate(total=Sum('amount'))
+
+    return render(request, 'finance_manager/reports.html', {'monthly_summary': monthly_summary})

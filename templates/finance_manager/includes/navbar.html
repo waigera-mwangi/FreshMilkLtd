@@ -1,0 +1,85 @@
+{% load static %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<header id="header" class="header fixed-top d-flex align-items-center">
+
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="*" class="logo d-flex align-items-center">
+      <span class="d-none d-lg-block">Fresh Milk Ltd - Finance</span>
+    </a>
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <form action="" method="get" class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search Payments / Reports" aria-label="Search" name="q" value="{{ request.GET.q }}">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+  <!-- End Search Bar -->
+
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
+
+      <!-- Search Icon (mobile) -->
+      <li class="nav-item d-block d-lg-none">
+        <a class="nav-link nav-icon search-bar-toggle" href="#">
+          <i class="bi bi-search"></i>
+        </a>
+      </li>
+
+      <!-- Profile Picture -->
+      <li class="nav-item dropdown pe-3">
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          {% if request.user.is_authenticated and request.user.profile.image %}
+            <img class="rounded-circle" src="{{ request.user.profile.image.url }}" alt="Profile Picture">
+          {% else %}
+            <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default Picture">
+          {% endif %}
+        </a>
+
+        <!-- Dropdown Menu -->
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header">
+            <h6>{{ request.user.get_full_name|title }}</h6>
+            <small class="text-muted">Finance Manager</small>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*">
+              <i class="bi bi-person"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'payments:reports' %}">
+              <i class="bi bi-graph-up"></i>
+              <span>Financial Reports</span>
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*"
+              <i class="bi bi-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</header>

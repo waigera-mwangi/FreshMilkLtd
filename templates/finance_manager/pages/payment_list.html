@@ -1,0 +1,73 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+{% load humanize %}
+
+{% block title %}Payments List{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Payments List</h5>
+      <form method="get" class="d-flex">
+        <input type="text" name="q" class="form-control form-control-sm me-2" 
+               placeholder="Search by Farmer or Ref..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-sm btn-primary">Search</button>
+      </form>
+    </div>
+
+    <div class="card-body table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Farmer</th>
+            <th>Reference</th>
+            <th>Amount (KES)</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if payments %}
+            {% for payment in payments %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ payment.farmer.get_full_name }}</td>
+                <td>{{ payment.reference }}</td>
+                <td>{{ payment.amount|floatformat:2|intcomma }}</td>
+                <td>
+                  {% if payment.status == "paid" %}
+                    <span class="badge bg-success">Paid</span>
+                  {% elif payment.status == "pending" %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% else %}
+                    <span class="badge bg-danger">Failed</span>
+                  {% endif %}
+                </td>
+                <td>{{ payment.generated_on|date:"M d, Y H:i" }}</td>
+                <td>
+                  <a href="{% url 'payments:payment_detail' payment.id %}" 
+                     class="btn btn-sm btn-info">View</a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-muted">No payments found.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer with summary -->
+    <div class="card-footer d-flex justify-content-between">
+      <span class="fw-bold">Total Payments: {{ payments.count }}</span>
+      <span class="fw-bold">Total Amount: KES {{ total_amount|floatformat:2|intcomma }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
