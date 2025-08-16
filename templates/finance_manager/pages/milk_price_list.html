@@ -1,0 +1,69 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">Milk Price List</h4>
+        <a href="{% url 'payments:add_milk_price' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle"></i> Add New Price
+        </a>
+    </div>
+
+    {% if prices %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Price per Litre (KES)</th>
+                    <th>Effective From</th>
+                    <th>Effective To</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price in prices %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ price.price_per_liter|floatformat:2|intcomma }}</td>
+                    <td>{{ price.effective_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if price.effective_to %}
+                            {{ price.effective_to|date:"M d, Y" }}
+                        {% else %}
+                            <span class="text-muted">Ongoing</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not price.effective_to or price.effective_to >= today %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Expired</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'payments:edit_milk_price' price.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="{% url 'payments:delete_milk_price' price.id %}" 
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Are you sure you want to delete this record?');">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle"></i> No milk prices set yet. 
+        <a href="{% url 'payments:add_milk_price' %}">Click here to add one</a>.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

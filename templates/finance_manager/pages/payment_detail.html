@@ -1,0 +1,67 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+{% load humanize %}
+
+{% block title %}Payment Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Payment Details</h5>
+      <a href="{% url 'payments:payment_list' %}" class="btn btn-sm btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card-body">
+      <dl class="row">
+        <dt class="col-sm-3">Farmer</dt>
+        <dd class="col-sm-9">{{ payment.farmer.get_full_name }}</dd>
+
+        <dt class="col-sm-3">Farmer ID</dt>
+        <dd class="col-sm-9">{{ payment.farmer.farmer_id }}</dd>
+
+        <dt class="col-sm-3">Reference</dt>
+        <dd class="col-sm-9">{{ payment.reference }}</dd>
+
+        <dt class="col-sm-3">Amount</dt>
+        <dd class="col-sm-9 fw-bold text-success">KES {{ payment.amount|floatformat:2|intcomma }}</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          {% if payment.status == "paid" %}
+            <span class="badge bg-success">Paid</span>
+          {% elif payment.status == "pending" %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% else %}
+            <span class="badge bg-danger">Failed</span>
+          {% endif %}
+        </dd>
+
+        <dt class="col-sm-3">Created At</dt>
+        <dd class="col-sm-9">{{ payment.created_at|date:"M d, Y H:i" }}</dd>
+
+        <dt class="col-sm-3">Updated At</dt>
+        <dd class="col-sm-9">{{ payment.updated_at|date:"M d, Y H:i" }}</dd>
+
+        <dt class="col-sm-3">Notes</dt>
+        <dd class="col-sm-9">
+          {% if payment.notes %}
+            {{ payment.notes }}
+          {% else %}
+            <span class="text-muted">No notes provided.</span>
+          {% endif %}
+        </dd>
+      </dl>
+    </div>
+
+    <div class="card-footer text-end">
+      {% if payment.status == "pending" %}
+        <a href="{% url 'payments:mark_payment_paid' payment.id %}" class="btn btn-success btn-sm">Mark as Paid</a>
+      {% endif %}
+      <a href="{% url 'payments:payment_list' %}" class="btn btn-secondary btn-sm">Back</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

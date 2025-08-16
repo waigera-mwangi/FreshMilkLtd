@@ -100,7 +100,7 @@ def finance_dashboard(request):
 @user_passes_test(is_finance_manager)
 def milk_price_list(request):
     prices = MilkPrice.objects.all()
-    return render(request, 'finance_manager/milk_price_list.html', {'prices': prices})
+    return render(request, 'finance_manager/pages/milk_price_list.html', {'prices': prices})
 
 
 @login_required
@@ -113,7 +113,7 @@ def milk_price_create(request):
             return redirect('finance_manager:milk_price_list')
     else:
         form = MilkPriceForm()
-    return render(request, 'finance_manager/milk_price_form.html', {'form': form})
+    return render(request, 'finance_manager/pages/milk_price_form.html', {'form': form})
 
 
 @login_required
@@ -127,7 +127,7 @@ def payment_list(request):
 @user_passes_test(is_finance_manager)
 def payment_detail(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
-    return render(request, 'finance_manager/payment_detail.html', {'payment': payment})
+    return render(request, 'finance_manager/pages/payment_detail.html', {'payment': payment})
 
 
 @login_required
@@ -141,9 +141,120 @@ def mark_payment_paid(request, pk):
 
 @login_required
 @user_passes_test(is_finance_manager)
-def reports(request):
+def payments_reports(request):
     monthly_summary = Payment.objects.filter(status=Payment.PaymentStatus.PAID).extra(
         select={'month': "strftime('%%m', generated_on)"}
     ).values('month').annotate(total=Sum('amount'))
 
-    return render(request, 'finance_manager/reports.html', {'monthly_summary': monthly_summary})
+    return render(request, 'finance_manager/pages/payments_reports.html', {'monthly_summary': monthly_summary})
+
+
+
+
+@login_required
+def pending_payments(request):
+    """
+    Show all pending payments for the finance manager.
+    """
+    payments = Payment.objects.filter(status="pending").select_related("farmer")
+
+    context = {
+        "payments": payments
+    }
+    return render(request, "finance_manager/pages/pending_payments.html", context)
+
+
+
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from django.http import HttpResponse
+from .models import Payment
+
+
+def export_payments_pdf(request):
+    # Prepare HTTP response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="payments_report.pdf"'
+
+    # Create PDF document
+    doc = SimpleDocTemplate(response, pagesize=A4)
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+    title = Paragraph("Payments Report", styles["Title"])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+
+    # Table header
+    data = [["Farmer Name", "Farmer ID", "Reference", "Amount (KES)", "Status", "Date"]]
+
+    # Query payments
+    payments = Payment.objects.select_related("farmer").all()
+
+    for payment in payments:
+        data.append([
+            payment.farmer.get_full_name() if payment.farmer else "N/A",
+            getattr(payment.farmer, "farmer_id", "N/A"),
+            payment.reference,
+            f"{payment.amount:.2f}",
+            payment.status.capitalize(),
+            payment.generated_on.strftime("%Y-%m-%d"),
+        ])
+
+    # Create table
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#4CAF50")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    return response
+
+def add_milk_price(request):
+    if request.method == "POST":
+        form = MilkPriceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Milk price added successfully ✅")
+            return redirect("payments:milk_price_list")
+        else:
+            messages.error(request, "Please fix the errors below ❌")
+    else:
+        form = MilkPriceForm()
+
+    return render(request, "finance_manager/pages/add_milk_price.html", {"form":form})
+
+
+from django.contrib import messages
+def edit_milk_price(request, pk):
+    price = get_object_or_404(MilkPrice, pk=pk)
+
+    if request.method == "POST":
+        form = MilkPriceForm(request.POST, instance=price)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Milk price updated successfully ✅")
+            return redirect("payments:milk_price_list")
+        else:
+            messages.error(request, "Please correct the errors below ❌")
+    else:
+        form = MilkPriceForm(instance=price)
+
+    return render(request, "finance_manager/pages/edit_milk_price.html", {"form": form, "price": price})
+
+
+def delete_milk_price(request, pk):
+    price = get_object_or_404(MilkPrice, pk=pk)
+    price.delete()
+    messages.success(request, "Milk price deleted successfully ✅")
+    return redirect("payments:milk_price_list")
