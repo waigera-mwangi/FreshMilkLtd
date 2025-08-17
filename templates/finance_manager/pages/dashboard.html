@@ -1,0 +1,96 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Total Pending Payments</h5>
+                <h3>{{ total_pending|floatformat:2 }} KES</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5>Paid This Month</h5>
+                <h3>{{ paid_this_month|floatformat:2 }} KES</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <h5>Outstanding Farmers</h5>
+                <h3>{{ outstanding_farmers }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>Active Milk Price</h5>
+                {% if active_milk_price %}
+                    <h3>{{ active_milk_price.price_per_liter }} KES</h3>
+                    <small>Effective: {{ active_milk_price.effective_date }}</small>
+                {% else %}
+                    <h3>Not Set</h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Monthly Payments Trend</div>
+            <div class="card-body">
+                <canvas id="paymentsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Payments Status Summary</div>
+            <div class="card-body">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const paymentsCtx = document.getElementById('paymentsChart').getContext('2d');
+    new Chart(paymentsCtx, {
+        type: 'line',
+        data: {
+            labels: {{ months|safe }},
+            datasets: [{
+                label: 'Payments Received (KES)',
+                data: {{ totals|safe }},
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
+        }
+    });
+
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Paid', 'Pending'],
+            datasets: [{
+                data: [{{ paid_count }}, {{ pending_count }}],
+                backgroundColor: ['#4CAF50', '#F44336']
+            }]
+        }
+    });
+</script>
+{% endblock %}

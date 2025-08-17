@@ -1,0 +1,41 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+
+{% block content %}
+<div class="container mt-4">
+    <h4 class="fw-bold mb-3">Add Milk Price</h4>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card p-4 shadow-sm">
+            <div class="mb-3">
+                <label class="form-label">Price per Liter (KES)</label>
+                {{ form.price_per_liter }}
+                {% if form.price_per_liter.errors %}
+                    <div class="text-danger">{{ form.price_per_liter.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Effective Date</label>
+                {{ form.effective_date }}
+                {% if form.effective_date.errors %}
+                    <div class="text-danger">{{ form.effective_date.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-check mb-3">
+                {{ form.is_active }}
+                <label class="form-check-label">Set as Active Price</label>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Save
+            </button>
+            <a href="{% url 'payments:milk_price_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

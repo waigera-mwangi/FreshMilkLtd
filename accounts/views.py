@@ -86,7 +86,7 @@ def farmer(request):
 # finance_manager
 @required_access(login_url=reverse_lazy('accounts:login'), user_type="FM")
 def finance_manager(request):
-    return render(request, 'finance_manager/pages/index.html')
+    return redirect('payments:finance_dashboard')
 
 # field_agent
 @required_access(login_url=reverse_lazy('accounts:login'), user_type="FA")

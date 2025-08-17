@@ -1,0 +1,150 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+{% load humanize %}
+
+{% block title %}Payments Report{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Page Heading -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">Payments Report</h3>
+    <a href="{% url 'payments:export_payments_pdf' %}" class="btn btn-success btn-sm">
+      <i class="bi bi-file-earmark-excel"></i> Export Pdf
+    </a>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 p-3">
+        <h6>Total Payments</h6>
+        <h4 class="fw-bold">KES {{ total_amount|floatformat:2|intcomma }}</h4>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 p-3">
+        <h6>Paid</h6>
+        <h4 class="fw-bold text-success">KES {{ total_paid|floatformat:2|intcomma }}</h4>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 p-3">
+        <h6>Pending</h6>
+        <h4 class="fw-bold text-warning">KES {{ total_pending|floatformat:2|intcomma }}</h4>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 p-3">
+        <h6>Failed</h6>
+        <h4 class="fw-bold text-danger">KES {{ total_failed|floatformat:2|intcomma }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 p-3">
+        <h6 class="mb-3">Payments by Status</h6>
+        <canvas id="statusChart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 p-3">
+        <h6 class="mb-3">Monthly Payments</h6>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header">
+      <h6 class="mb-0">All Payments</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Farmer</th>
+              <th>Farmer ID</th>
+              <th>Reference</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in payments %}
+            <tr>
+              <td>{{ payment.farmer.get_full_name }}</td>
+              <td>{{ payment.farmer.farmer_id }}</td>
+              <td>{{ payment.reference }}</td>
+              <td>KES {{ payment.amount|floatformat:2|intcomma }}</td>
+              <td>
+                {% if payment.status == "paid" %}
+                  <span class="badge bg-success">Paid</span>
+                {% elif payment.status == "pending" %}
+                  <span class="badge bg-warning text-dark">Pending</span>
+                {% else %}
+                  <span class="badge bg-danger">Failed</span>
+                {% endif %}
+              </td>
+              <td>{{ payment.created_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Payments by Status (Pie Chart)
+  var ctx1 = document.getElementById('statusChart').getContext('2d');
+  new Chart(ctx1, {
+    type: 'pie',
+    data: {
+      labels: ['Paid', 'Pending', 'Failed'],
+      datasets: [{
+        data: [{{ total_paid }}, {{ total_pending }}, {{ total_failed }}],
+        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+      }]
+    }
+  });
+
+  // Monthly Payments (Bar Chart)
+  var ctx2 = document.getElementById('monthlyChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: {{ months|safe }},
+      datasets: [{
+        label: 'Payments (KES)',
+        data: {{ monthly_amounts|safe }},
+        backgroundColor: '#007bff'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return 'KES ' + value.toLocaleString();
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

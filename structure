@@ -1,0 +1,8 @@
+finance_manager/
+    dashboard/                # Overview metrics, quick actions
+    milk_prices/              # List & manage milk prices
+    milk_prices/add/          # Add new milk price
+    payments/                 # List & filter payments
+    payments/<id>/            # View payment details
+    payments/<id>/mark-paid/  # Mark payment as paid
+    reports/                  # Charts and exports

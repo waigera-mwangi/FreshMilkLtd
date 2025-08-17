@@ -1,0 +1,49 @@
+<aside id="layout-menu" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'payments:finance_dashboard' %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <!-- Payments -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'payments:payment_list' %}">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>All Payments</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'payments:pending_payments' %}">
+        <i class="fas fa-hourglass-half"></i>
+        <span>Pending Payments</span>
+      </a>
+    </li>
+
+    <!-- Reports -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'payments:payments_reports' %}">
+        <i class="fas fa-chart-line"></i>
+        <span>Payment Reports</span>
+      </a>
+    </li>
+
+    <!-- Milk Prices -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'payments:milk_price_list' %}">
+        <i class="fas fa-coins"></i>
+        <span>Milk Prices</span>
+      </a>
+    </li>
+
+
+    
+
+  </ul>
+
+</aside><!-- End Sidebar -->
