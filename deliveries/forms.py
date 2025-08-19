@@ -59,3 +59,13 @@ class PickupLocationForm(forms.ModelForm):
             "description": "Description",
             "is_active": "Active",
         }
+
+
+class FieldSupervisionForm(forms.ModelForm):
+    class Meta:
+        model = FieldSupervision
+        fields = ["field_agent", "supervision_date", "notes"]
+        widgets = {
+            "supervision_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "notes": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+        }

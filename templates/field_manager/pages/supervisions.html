@@ -3,7 +3,12 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4">Supervisions</h2>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Supervisions</h2>
+    <a href="{% url 'deliveries:add_supervision' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Add New Supervision
+    </a>
+  </div>
 
   {% if supervisions %}
     <div class="table-responsive">
@@ -15,6 +20,7 @@
             <th>Field Agent</th>
             <th>Supervision Date</th>
             <th>Notes</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -25,6 +31,14 @@
             <td>{{ supervision.field_agent.get_full_name }}</td>
             <td>{{ supervision.supervision_date|date:"M d, Y" }}</td>
             <td>{{ supervision.notes|default:"—" }}</td>
+            <td>
+              <a href="{% url 'deliveries:edit_supervision' supervision.id %}" class="btn btn-sm btn-warning">
+                <i class="bi bi-pencil"></i> Edit
+              </a>
+              <a href="{% url 'deliveries:delete_supervision' supervision.id %}" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Delete
+              </a>
+            </td>
           </tr>
           {% endfor %}
         </tbody>

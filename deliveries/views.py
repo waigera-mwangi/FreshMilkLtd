@@ -317,7 +317,6 @@ def milk_collections_report(request):
         "summary": summary
     })
 
-
 @login_required
 @user_passes_test(is_field_manager)
 def supervisions(request):
@@ -325,6 +324,46 @@ def supervisions(request):
     return render(request, "field_manager/pages/supervisions.html", {"supervisions": supervisions})
 
 
+@login_required
+@user_passes_test(is_field_manager)
+def add_supervision(request):
+    if request.method == "POST":
+        form = FieldSupervisionForm(request.POST)
+        if form.is_valid():
+            supervision = form.save(commit=False)
+            supervision.manager = request.user  # assign logged-in manager
+            supervision.save()
+            messages.success(request, "Supervision added successfully.")
+            return redirect("deliveries:supervisions")
+    else:
+        form = FieldSupervisionForm()
+    return render(request, "field_manager/pages/add_supervision.html", {"form": form})
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def edit_supervision(request, pk):
+    supervision = get_object_or_404(FieldSupervision, pk=pk)
+    if request.method == "POST":
+        form = FieldSupervisionForm(request.POST, instance=supervision)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Supervision updated successfully.")
+            return redirect("deliveries:supervisions")
+    else:
+        form = FieldSupervisionForm(instance=supervision)
+    return render(request, "field_manager/pages/edit_supervision.html", {"form": form, "supervision": supervision})
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def delete_supervision(request, pk):
+    supervision = get_object_or_404(FieldSupervision, pk=pk)
+    if request.method == "POST":
+        supervision.delete()
+        messages.success(request, "Supervision deleted successfully.")
+        return redirect("deliveries:supervisions")
+    return render(request, "field_manager/pages/delete_supervision.html", {"supervision": supervision})
 
 @login_required
 @user_passes_test(is_field_manager)

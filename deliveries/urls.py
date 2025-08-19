@@ -24,8 +24,12 @@ urlpatterns = [
     path("pickup-locations/<int:pk>/edit/", views.edit_pickup_location, name="edit_pickup_location"),
     path("pickup-locations/<int:pk>/delete/", views.delete_pickup_location, name="delete_pickup_location"),
     path("milk-collections/", views.milk_collections_report, name="milk_collections_report"),
-    path("supervisions/", views.supervisions, name="supervisions"),
     
+    path("supervisions/", views.supervisions, name="supervisions"),
+    path("supervisions/add/", views.add_supervision, name="add_supervision"),
+    path("supervisions/<int:pk>/edit/", views.edit_supervision, name="edit_supervision"),
+    path("supervisions/<int:pk>/delete/", views.delete_supervision, name="delete_supervision"),
+
     path("farmers/", views.farmers_list, name="farmers_list"),
     path("farmers/<int:farmer_id>/", views.farmer_detail, name="farmer_detail"),
     
