@@ -323,3 +323,22 @@ def milk_collections_report(request):
 def supervisions(request):
     supervisions = FieldSupervision.objects.select_related("manager", "field_agent").order_by("-supervision_date")
     return render(request, "field_manager/pages/supervisions.html", {"supervisions": supervisions})
+
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def farmers_list(request):
+    farmers = User.objects.filter(user_type="FR").order_by("first_name", "last_name")
+    return render(request, "field_manager/pages/farmers_list.html", {"farmers": farmers})
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def farmer_detail(request, farmer_id):
+    farmer = get_object_or_404(User, pk=farmer_id, user_type="FR")
+    milk_collections = farmer.milk_collections.select_related("pickup_location").order_by("-collection_date")
+    return render(request, "field_manager/pages/farmer_detail.html", {
+        "farmer": farmer,
+        "milk_collections": milk_collections
+    })

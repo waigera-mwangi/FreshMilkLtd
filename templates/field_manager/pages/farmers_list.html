@@ -1,0 +1,36 @@
+{% extends "field_manager/layouts/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Farmers</h2>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for farmer in farmers %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ farmer.get_full_name }}</td>
+                <td>{{ farmer.phone_number }}</td>
+                <td>{{ farmer.email }}</td>
+                <td>
+                    <a href="{% url 'deliveries:farmer_detail' farmer.id %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye"></i> View
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No farmers registered yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
