@@ -383,7 +383,7 @@ def farmer_detail(request, farmer_id):
     })
 
 
-    @login_required
+
 @user_passes_test(is_field_manager)
 def milk_collections_report(request):
     # Aggregate total milk per farmer
