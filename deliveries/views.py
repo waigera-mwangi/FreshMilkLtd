@@ -413,3 +413,59 @@ def milk_collections_report(request):
         "daily_report": daily_report,
     }
     return render(request, "field_manager/pages/milk_collections_report.html", context)
+
+
+
+    from django.http import HttpResponse
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
+@login_required
+@user_passes_test(is_field_manager)
+def export_milk_collections_pdf(request):
+    # Query data
+    farmer_report = (
+        MilkCollection.objects.values("farmer__first_name", "farmer__last_name")
+        .annotate(total_quantity=Sum("quantity_liters"))
+        .order_by("-total_quantity")
+    )
+
+    # Create response
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="milk_collections_report.pdf"'
+
+    # PDF document setup
+    doc = SimpleDocTemplate(response, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Title
+    elements.append(Paragraph("Milk Collections Report", styles["Title"]))
+    elements.append(Spacer(1, 12))
+
+    # Table data
+    data = [["#", "Farmer", "Total Quantity (Liters)"]]
+    for idx, farmer in enumerate(farmer_report, start=1):
+        farmer_name = f"{farmer['farmer__first_name']} {farmer['farmer__last_name']}"
+        data.append([idx, farmer_name, farmer["total_quantity"]])
+
+    # Create table
+    table = Table(data, colWidths=[40, 200, 150])
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ]
+        )
+    )
+    elements.append(table)
+
+    # Build PDF
+    doc.build(elements)
+    return response
