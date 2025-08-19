@@ -1,0 +1,39 @@
+{% extends "field_manager/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Supervisions</h2>
+
+  {% if supervisions %}
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Manager</th>
+            <th>Field Agent</th>
+            <th>Supervision Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for supervision in supervisions %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ supervision.manager.get_full_name }}</td>
+            <td>{{ supervision.field_agent.get_full_name }}</td>
+            <td>{{ supervision.supervision_date|date:"M d, Y" }}</td>
+            <td>{{ supervision.notes|default:"—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      No supervisions have been recorded yet.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

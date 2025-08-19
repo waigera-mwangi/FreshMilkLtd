@@ -258,8 +258,50 @@ def manager_dashboard(request):
 @user_passes_test(is_field_manager)
 def pickup_locations(request):
     locations = PickupLocation.objects.all()
-    return render(request, "field_manager/pickup_locations.html", {"locations": locations})
+    return render(request, "field_manager/pages/pickup_locations.html", {"locations": locations})
 
+
+@login_required
+@user_passes_test(is_field_manager)
+def add_pickup_location(request):
+    """Add new pickup location"""
+    if request.method == "POST":
+        form = PickupLocationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pickup location added successfully.")
+            return redirect("deliveries:pickup_locations")
+    else:
+        form = PickupLocationForm()
+    return render(request, "field_manager/pages/add_pickup_location.html", {"form": form})
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def edit_pickup_location(request, pk):
+    """Edit existing pickup location"""
+    location = get_object_or_404(PickupLocation, pk=pk)
+    if request.method == "POST":
+        form = PickupLocationForm(request.POST, instance=location)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pickup location updated successfully.")
+            return redirect("deliveries:pickup_locations")
+    else:
+        form = PickupLocationForm(instance=location)
+    return render(request, "field_manager/pages/edit_pickup_location.html", {"form": form, "location": location})
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def delete_pickup_location(request, pk):
+    """Delete pickup location"""
+    location = get_object_or_404(PickupLocation, pk=pk)
+    if request.method == "POST":
+        location.delete()
+        messages.success(request, "Pickup location deleted successfully.")
+        return redirect("deliveries:pickup_locations")
+    return render(request, "field_manager/pages/confirm_delete_pickup_location.html", {"location": location})
 
 @login_required
 @user_passes_test(is_field_manager)
@@ -270,7 +312,7 @@ def milk_collections_report(request):
         total=Sum("quantity_liters"), count=Count("id")
     )
 
-    return render(request, "field_manager/milk_collections_report.html", {
+    return render(request, "field_manager/pages/milk_collections_report.html", {
         "collections": collections,
         "summary": summary
     })
@@ -280,4 +322,4 @@ def milk_collections_report(request):
 @user_passes_test(is_field_manager)
 def supervisions(request):
     supervisions = FieldSupervision.objects.select_related("manager", "field_agent").order_by("-supervision_date")
-    return render(request, "field_manager/supervisions.html", {"supervisions": supervisions})
+    return render(request, "field_manager/pages/supervisions.html", {"supervisions": supervisions})

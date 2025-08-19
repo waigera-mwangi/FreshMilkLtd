@@ -20,6 +20,10 @@ urlpatterns = [
     # field manager
     path("manager-dashboard/", views.manager_dashboard, name="manager_dashboard"),
     path("pickup-locations/", views.pickup_locations, name="pickup_locations"),
+    path("pickup-locations/add/", views.add_pickup_location, name="add_pickup_location"),
+    path("pickup-locations/<int:pk>/edit/", views.edit_pickup_location, name="edit_pickup_location"),
+    path("pickup-locations/<int:pk>/delete/", views.delete_pickup_location, name="delete_pickup_location"),
     path("milk-collections/", views.milk_collections_report, name="milk_collections_report"),
     path("supervisions/", views.supervisions, name="supervisions"),
+    
     ]

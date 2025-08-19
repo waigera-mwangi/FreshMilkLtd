@@ -10,17 +10,11 @@
       </a>
     </li>
 
-    <!-- Milk Collections -->
-    <li class="nav-item">
-      <a class="nav-link" href="*">
-        <i class="bi bi-bucket"></i>
-        <span>Milk Collections</span>
-      </a>
-    </li>
+   
 
     <!-- Farmers -->
     <li class="nav-item">
-      <a class="nav-link" href="*">
+      <a class="nav-link" href="{% url 'deliveries:farmers_list' %}">
         <i class="bi bi-person-lines-fill"></i>
         <span>Farmers</span>
       </a>
@@ -28,23 +22,23 @@
 
     <!-- Field Agents -->
     <li class="nav-item">
-      <a class="nav-link" href="*">
+      <a class="nav-link" href="{%url 'deliveries:supervisions' %}">
         <i class="bi bi-people"></i>
-        <span>Field Agents</span>
+        <span>Supervisions</span>
       </a>
     </li>
 
     <!-- Supervision Logs -->
     <li class="nav-item">
-      <a class="nav-link" href="*">
+      <a class="nav-link" href="{% url 'deliveries:pickup_locations' %}">
         <i class="bi bi-journal-text"></i>
-        <span>Supervision Logs</span>
+        <span>Pickup Locations</span>
       </a>
     </li>
 
     <!-- Reports -->
     <li class="nav-item">
-      <a class="nav-link" href="*">
+      <a class="nav-link" href="{% url 'deliveries:milk_collections_report' %}">
         <i class="fas fa-chart-line"></i>
         <span>Field Reports</span>
       </a>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import MilkCollection
+from .models import *
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -37,3 +37,25 @@ class MilkCollectionForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+
+
+
+
+class PickupLocationForm(forms.ModelForm):
+    class Meta:
+        model = PickupLocation
+        fields = ["name", "town", "description", "is_active"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter pickup location name"}),
+            "town": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter town"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "placeholder": "Optional description", "rows": 3}),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+        labels = {
+            "name": "Location Name",
+            "town": "Town",
+            "description": "Description",
+            "is_active": "Active",
+        }
