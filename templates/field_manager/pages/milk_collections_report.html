@@ -1,1 +1,95 @@
-{% extends 'field_manager/layouts/base.html' %}
+
+{% extends "field_manager/layouts/base.html" %}
+{% load humanize %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Milk Collections Report</h2>
+
+  <!-- Farmer Report -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">Total Milk by Farmer</div>
+    <div class="card-body">
+      {% if farmer_report %}
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Farmer</th>
+            <th>Total Quantity (Litres)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for farmer in farmer_report %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ farmer.farmer__first_name }} {{ farmer.farmer__last_name }}</td>
+            <td>{{ farmer.total_quantity|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-muted">No records available.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Location Report -->
+  <div class="card mb-4">
+    <div class="card-header bg-success text-white">Total Milk by Pickup Location</div>
+    <div class="card-body">
+      {% if location_report %}
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pickup Location</th>
+            <th>Total Quantity (Litres)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loc in location_report %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ loc.pickup_location__name }}</td>
+            <td>{{ loc.total_quantity|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-muted">No records available.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Daily Report -->
+  <div class="card mb-4">
+    <div class="card-header bg-info text-white">Daily Milk Collections</div>
+    <div class="card-body">
+      {% if daily_report %}
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Total Quantity (Litres)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for day in daily_report %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ day.collection_date|date:"M d, Y" }}</td>
+            <td>{{ day.total_quantity|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-muted">No records available.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
