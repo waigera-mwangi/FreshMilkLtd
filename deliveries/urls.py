@@ -26,4 +26,7 @@ urlpatterns = [
     path("milk-collections/", views.milk_collections_report, name="milk_collections_report"),
     path("supervisions/", views.supervisions, name="supervisions"),
     
+    path("farmers/", views.farmers_list, name="farmers_list"),
+    path("farmers/<int:farmer_id>/", views.farmer_detail, name="farmer_detail"),
+    
     ]
