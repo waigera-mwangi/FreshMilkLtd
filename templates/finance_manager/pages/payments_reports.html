@@ -85,15 +85,15 @@
               <td>{{ payment.reference }}</td>
               <td>KES {{ payment.amount|floatformat:2|intcomma }}</td>
               <td>
-                {% if payment.status == "paid" %}
+                {% if payment.status == "Paid" %}
                   <span class="badge bg-success">Paid</span>
-                {% elif payment.status == "pending" %}
-                  <span class="badge bg-warning text-dark">Pending</span>
-                {% else %}
-                  <span class="badge bg-danger">Failed</span>
+                  {% elif payment.status == "Pending" %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% else %}
+                    <span class="badge bg-danger">Paid</span>
                 {% endif %}
               </td>
-              <td>{{ payment.created_at|date:"M d, Y" }}</td>
+              <td>{{ payment.generated_on|date:"M d, Y" }}</td>
             </tr>
             {% endfor %}
           </tbody>

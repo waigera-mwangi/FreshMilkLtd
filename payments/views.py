@@ -145,15 +145,48 @@ def mark_payment_paid(request, payment_id):
     return redirect("payments:payment_detail", payment.id)
 
 
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Payment
+  # adjust import to your project
+
+
 @login_required
-@user_passes_test(is_finance_manager)
+
 def payments_reports(request):
-    monthly_summary = Payment.objects.filter(status=Payment.PaymentStatus.PAID).extra(
-        select={'month': "strftime('%%m', generated_on)"}
-    ).values('month').annotate(total=Sum('amount'))
+    # All payments
+    payments = Payment.objects.all()
 
-    return render(request, 'finance_manager/pages/payments_reports.html', {'monthly_summary': monthly_summary})
+    # Summary totals
+    total_amount = payments.aggregate(total=Sum('amount'))['total'] or 0
+    total_paid = payments.filter(status=Payment.PaymentStatus.PAID).aggregate(total=Sum('amount'))['total'] or 0
+    total_pending = payments.filter(status=Payment.PaymentStatus.PENDING).aggregate(total=Sum('amount'))['total'] or 0
+    total_failed = payments.filter(status=Payment.PaymentStatus.FAILED).aggregate(total=Sum('amount'))['total'] or 0
 
+    # Monthly payments (grouped by generated_on month)
+    monthly_summary = (
+        payments.filter(status=Payment.PaymentStatus.PAID)
+        .annotate(month=TruncMonth('generated_on'))
+        .values('month')
+        .annotate(total=Sum('amount'))
+        .order_by('month')
+    )
+
+    months = [entry['month'].strftime("%b %Y") for entry in monthly_summary]
+    monthly_amounts = [float(entry['total']) for entry in monthly_summary]
+
+    context = {
+        'payments': payments,
+        'total_amount': total_amount,
+        'total_paid': total_paid,
+        'total_pending': total_pending,
+        'total_failed': total_failed,
+        'months': months,
+        'monthly_amounts': monthly_amounts,
+    }
+    return render(request, 'finance_manager/pages/payments_reports.html', context)
 
 
 
