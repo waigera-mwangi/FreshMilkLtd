@@ -132,22 +132,61 @@ def payment_detail(request, pk):
 
 @login_required
 @user_passes_test(is_finance_manager)
-def mark_payment_paid(request, pk):
-    payment = get_object_or_404(Payment, pk=pk)
-    payment.status = Payment.PaymentStatus.PAID
-    payment.save()
-    return redirect('payments:payment_list')
+def mark_payment_paid(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id)
+
+    if payment.status == Payment.PaymentStatus.PAID:
+        messages.info(request, "This payment is already marked as paid.")
+    else:
+        payment.status = Payment.PaymentStatus.PAID
+        payment.save()
+        messages.success(request, f"Payment {payment.reference} marked as PAID.")
+
+    return redirect("payments:payment_detail", payment.id)
+
+
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Payment
+  # adjust import to your project
 
 
 @login_required
-@user_passes_test(is_finance_manager)
+
 def payments_reports(request):
-    monthly_summary = Payment.objects.filter(status=Payment.PaymentStatus.PAID).extra(
-        select={'month': "strftime('%%m', generated_on)"}
-    ).values('month').annotate(total=Sum('amount'))
+    # All payments
+    payments = Payment.objects.all()
 
-    return render(request, 'finance_manager/pages/payments_reports.html', {'monthly_summary': monthly_summary})
+    # Summary totals
+    total_amount = payments.aggregate(total=Sum('amount'))['total'] or 0
+    total_paid = payments.filter(status=Payment.PaymentStatus.PAID).aggregate(total=Sum('amount'))['total'] or 0
+    total_pending = payments.filter(status=Payment.PaymentStatus.PENDING).aggregate(total=Sum('amount'))['total'] or 0
+    total_failed = payments.filter(status=Payment.PaymentStatus.FAILED).aggregate(total=Sum('amount'))['total'] or 0
 
+    # Monthly payments (grouped by generated_on month)
+    monthly_summary = (
+        payments.filter(status=Payment.PaymentStatus.PAID)
+        .annotate(month=TruncMonth('generated_on'))
+        .values('month')
+        .annotate(total=Sum('amount'))
+        .order_by('month')
+    )
+
+    months = [entry['month'].strftime("%b %Y") for entry in monthly_summary]
+    monthly_amounts = [float(entry['total']) for entry in monthly_summary]
+
+    context = {
+        'payments': payments,
+        'total_amount': total_amount,
+        'total_paid': total_paid,
+        'total_pending': total_pending,
+        'total_failed': total_failed,
+        'months': months,
+        'monthly_amounts': monthly_amounts,
+    }
+    return render(request, 'finance_manager/pages/payments_reports.html', context)
 
 
 
@@ -258,3 +297,86 @@ def delete_milk_price(request, pk):
     price.delete()
     messages.success(request, "Milk price deleted successfully ✅")
     return redirect("payments:milk_price_list")
+
+
+
+
+    # payments/views.py
+from django.db.models import Sum
+from django.utils.timezone import now
+import calendar
+from datetime import date
+from django.utils.crypto import get_random_string
+from decimal import Decimal
+from deliveries.models import MilkCollection
+
+@login_required
+def create_payment(request):
+    """
+    Auto-generate monthly payments for a farmer.
+    One payment per month based on milk collected.
+    """
+    if request.method == "POST":
+        farmer_id = request.POST.get("farmer")
+
+        if not farmer_id:
+            messages.error(request, "Please select a farmer.")
+            return redirect("payments:create_payment")
+
+        # Get all milk collections for this farmer not already linked to a payment
+        collections = MilkCollection.objects.filter(
+            farmer_id=farmer_id,
+            payments=None  # not yet linked to payment
+        ).order_by("collection_date")
+
+        if not collections.exists():
+            messages.warning(request, "No pending milk collections found for this farmer.")
+            return redirect("payments:create_payment")
+
+        # Get current milk price
+        milk_price = MilkPrice.objects.filter(is_active=True).first()
+        if not milk_price:
+            messages.error(request, "No active milk price set.")
+            return redirect("payments:create_payment")
+
+        # Group collections by year & month
+        grouped = {}
+        for c in collections:
+            key = (c.collection_date.year, c.collection_date.month)
+            grouped.setdefault(key, []).append(c)
+
+        created_payments = []
+
+        for (year, month), colls in grouped.items():
+            start_date = date(year, month, 1)
+            end_date = date(year, month, calendar.monthrange(year, month)[1])
+
+            total_liters = sum([c.quantity_liters for c in colls])
+            amount = Decimal(total_liters) * milk_price.price_per_liter
+
+            payment = Payment.objects.create(
+                farmer_id=farmer_id,
+                start_date=start_date,
+                end_date=end_date,
+                amount=amount,
+                status=Payment.PaymentStatus.PENDING,
+                reference=f"PAY-{get_random_string(8).upper()}"
+            )
+            payment.milk_collections.set(colls)
+            created_payments.append(payment)
+
+        if created_payments:
+            messages.success(
+                request,
+                f"{len(created_payments)} monthly payment(s) generated for farmer."
+            )
+            return redirect("payments:payment_list")  # redirect to list view
+        else:
+            messages.info(request, "No new payments were generated.")
+            return redirect("payments:create_payment")
+
+    # If GET → Show farmers
+    farmers = Payment.farmer.field.related_model.objects.filter(user_type="FR")
+    return render(request, "finance_manager/pages/create_payment.html", {"farmers": farmers})
+
+

@@ -12,6 +12,13 @@
 
     <!-- Payments -->
     <li class="nav-item">
+      <a class="nav-link" href="{% url 'payments:create_payment' %}">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Create Payments</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
       <a class="nav-link" href="{% url 'payments:payment_list' %}">
         <i class="fas fa-money-bill-wave"></i>
         <span>All Payments</span>

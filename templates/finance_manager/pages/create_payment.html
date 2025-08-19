@@ -1,0 +1,28 @@
+{% extends 'finance_manager/layouts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Payment</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="farmer" class="form-label">Farmer</label>
+            <select name="farmer" id="farmer" class="form-select" required>
+                <option value="">-- Select Farmer --</option>
+                {% for farmer in farmers %}
+                <option value="{{ farmer.id }}">{{ farmer.get_full_name|default:farmer.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Generate Payment</button>
+    </form>
+</div>
+{% endblock %}
