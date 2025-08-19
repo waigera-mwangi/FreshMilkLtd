@@ -10,7 +10,6 @@
                 <th>Farmer</th>
                 <th>Period</th>
                 <th>Amount</th>
-                <th>Status</th>
                 <th>Generated On</th>
                 <th>Action</th>
             </tr>
@@ -22,11 +21,7 @@
                 <td>{{ payment.farmer.get_full_name|default:payment.farmer.username }}</td>
                 <td>{{ payment.start_date }} → {{ payment.end_date }}</td>
                 <td>{{ payment.amount }} KES</td>
-                <td>
-                    <span class="badge {% if payment.status == 'PAID' %}bg-success{% else %}bg-warning{% endif %}">
-                        {{ payment.get_status_display }}
-                    </span>
-                </td>
+              
                 <td>{{ payment.generated_on|date:"Y-m-d H:i" }}</td>
                 <td>
                     {% if payment.status != 'PAID' %}
