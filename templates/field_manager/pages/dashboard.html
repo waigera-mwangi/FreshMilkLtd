@@ -1,0 +1,39 @@
+{% extends 'field_manager/layouts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="fw-bold mb-4">Field Manager Dashboard</h3>
+
+  <!-- Stats -->
+  <div class="row mb-4">
+    <div class="col-md-3"><div class="card p-3 shadow-sm">Today: {{ total_milk_today }} L</div></div>
+    <div class="col-md-3"><div class="card p-3 shadow-sm">This Month: {{ total_milk_month }} L</div></div>
+    <!-- <div class="col-md-3"><div class="card p-3 shadow-sm text-warning">Unpaid: {{ total_unpaid }} L</div></div> -->
+    <div class="col-md-3"><div class="card p-3 shadow-sm">Agents: {{ total_agents }}</div></div>
+  </div>
+
+  <!-- Recent Milk Collections -->
+  <h5 class="fw-bold">Recent Milk Collections</h5>
+  <table class="table table-sm table-striped">
+    <thead><tr><th>Farmer</th><th>Liters</th><th>Pickup</th><th>Date</th></tr></thead>
+    <tbody>
+      {% for c in recent_collections %}
+      <tr>
+        <td>{{ c.farmer.get_full_name }}</td>
+        <td>{{ c.quantity_liters }}</td>
+        <td>{{ c.pickup_location.name }}</td>
+        <td>{{ c.collection_date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Recent Supervisions -->
+  <h5 class="fw-bold mt-4">Recent Supervisions</h5>
+  <ul>
+    {% for s in recent_supervisions %}
+      <li>{{ s.supervision_date }} - {{ s.manager.get_full_name }} supervised {{ s.field_agent.get_full_name }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

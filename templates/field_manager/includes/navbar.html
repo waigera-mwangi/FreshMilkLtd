@@ -1,108 +1,92 @@
 {% load static %}
-  <!-- ======= Header ======= -->
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">  
-  </script>  
 
-  <header id="header" class="header fixed-top d-flex align-items-center">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <div class="d-flex align-items-center justify-content-between">
-      <a href="{% url 'accounts:service_provider' %}" class="logo d-flex align-items-center">
-{#        <img src="#" alt="">#}
-        <span class="d-none d-lg-block">Fresh Milk Ltd</span>
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div><!-- End Logo -->
+<header id="header" class="header fixed-top d-flex align-items-center">
 
-    <nav class="header-nav ms-auto">
-      <ul class="d-flex align-items-center">
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="{% url 'deliveries:manager_dashboard' %}" class="logo d-flex align-items-center">
+      <span class="d-none d-lg-block">Fresh Milk Ltd - Field Manager</span>
+    </a>
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+  </div>
 
-        <li class="nav-item d-block d-lg-none">
-          <a class="nav-link nav-icon search-bar-toggle " href="#">
-            <i class="#"></i>
-          </a>
-        </li><!-- End Search Icon-->
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <form action="*" method="get" class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search Farmers / Agents / Collections" aria-label="Search" name="q" value="{{ request.GET.q }}">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+  <!-- End Search Bar -->
 
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
 
-            {% load static %}
-
-<a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-  {% if request.user.is_authenticated %}
-    {% if request.user.farmer_profile.image %}
-      <img class="rounded-circle" src="{{ request.user.farmer_profile.image.url }}" alt="Profile Picture">
-    {% else %}
-      <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default">
-    {% endif %}
-  {% else %}
-    <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default Picture">
-  {% endif %}
-</a>
-
-            
-          
-
-
-          <!-- end of profile picture  -->
-
-  
-        <li class="nav-item dropdown pe-3">
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6>{{ request.user.get_full_name|title }}</h6>
-         <small class="text-muted" >Hello {{user.get_user_type_display}}!</small>
-<!-- {#              <span>farmer</span>#} -->
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-
-
-        <li class="nav-item">
-        <a class="nav-link collapsed" href="#">
-          <i class="bi bi-person" style="font-size: large"></i>
-          <span>Change password</span>
+      <!-- Search Icon (mobile) -->
+      <li class="nav-item d-block d-lg-none">
+        <a class="nav-link nav-icon search-bar-toggle" href="#">
+          <i class="bi bi-search"></i>
         </a>
       </li>
 
-      <li>
-        <hr class="dropdown-divider">
+      <!-- Profile Picture -->
+      <li class="nav-item dropdown pe-3">
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+          {% if request.user.is_authenticated and request.user.profile.image %}
+            <img class="rounded-circle" src="{{ request.user.profile.image.url }}" alt="Profile Picture">
+          {% else %}
+            <img class="rounded-circle" src="{% static 'assets/img/default-profile.png' %}" alt="Default Picture">
+          {% endif %}
+        </a>
+
+        <!-- Dropdown Menu -->
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header">
+            <h6>{{ request.user.get_full_name|title }}</h6>
+            <small class="text-muted">Field Manager</small>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*">
+              <i class="bi bi-person"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*">
+              <i class="bi bi-journal-text"></i>
+              <span>Supervision Logs</span>
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*">
+              <i class="bi bi-bucket"></i>
+              <span>Milk Collections</span>
+            </a>
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="*">
+              <i class="bi bi-people"></i>
+              <span>Field Agents</span>
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider"></li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+        </ul>
       </li>
-
-
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
-              </a>
-            </li>
-
-            
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
-      </ul>
-    </nav><!-- End Icons Navigation -->
-
-  </header><!-- End Header -->
+    </ul>
+  </nav>
+</header>

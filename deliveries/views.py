@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import MilkCollection
+from .models import *
 from django.db.models import Sum
 from django.utils.dateformat import DateFormat
 from collections import defaultdict
@@ -201,3 +201,83 @@ def record_collection(request):
 def milk_collection_list(request):
     collections = MilkCollection.objects.all().order_by('-collection_date')
     return render(request, 'field_agent/pages/milk_collection_list.html', {'collections': collections})
+
+
+
+
+# field manager
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Sum, Count
+from django.utils import timezone
+
+def is_field_manager(user):
+    return user.is_authenticated and user.user_type == 'FD'
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def manager_dashboard(request):
+    today = timezone.now().date()
+
+    # Stats
+    total_milk_today = MilkCollection.objects.filter(collection_date=today).aggregate(
+        total=Sum('quantity_liters')
+    )['total'] or 0
+
+    total_milk_month = MilkCollection.objects.filter(
+        collection_date__month=today.month,
+        collection_date__year=today.year
+    ).aggregate(total=Sum('quantity_liters'))['total'] or 0
+
+    total_unpaid = MilkCollection.objects.filter(is_paid=False).aggregate(
+        total=Sum('quantity_liters')
+    )['total'] or 0
+
+    total_agents = User.objects.filter(user_type='FA').count()
+    active_locations = PickupLocation.objects.filter(is_active=True).count()
+
+    recent_collections = MilkCollection.objects.select_related('farmer', 'pickup_location')[:10]
+    recent_supervisions = FieldSupervision.objects.select_related('manager', 'field_agent').order_by('-supervision_date')[:5]
+
+    context = {
+        "total_milk_today": total_milk_today,
+        "total_milk_month": total_milk_month,
+        "total_unpaid": total_unpaid,
+        "total_agents": total_agents,
+        "active_locations": active_locations,
+        "recent_collections": recent_collections,
+        "recent_supervisions": recent_supervisions,
+    }
+    return render(request, "field_manager/pages/dashboard.html", context)
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def pickup_locations(request):
+    locations = PickupLocation.objects.all()
+    return render(request, "field_manager/pickup_locations.html", {"locations": locations})
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def milk_collections_report(request):
+    collections = MilkCollection.objects.select_related("farmer", "pickup_location").order_by("-collection_date")
+
+    summary = collections.values("pickup_location__name").annotate(
+        total=Sum("quantity_liters"), count=Count("id")
+    )
+
+    return render(request, "field_manager/milk_collections_report.html", {
+        "collections": collections,
+        "summary": summary
+    })
+
+
+@login_required
+@user_passes_test(is_field_manager)
+def supervisions(request):
+    supervisions = FieldSupervision.objects.select_related("manager", "field_agent").order_by("-supervision_date")
+    return render(request, "field_manager/supervisions.html", {"supervisions": supervisions})

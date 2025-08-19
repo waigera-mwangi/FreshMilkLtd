@@ -96,7 +96,7 @@ def field_agent(request):
 # field manager
 @required_access(login_url=reverse_lazy('accounts:login'), user_type="FD")
 def field_manager(request):
-        return render(request, 'field_manager/pages/index.html')
+        return redirect('deliveries:manager_dashboard')
 
 @required_access(login_url=reverse_lazy('accounts:login'), user_type="VO")
 def veterinary(request):

@@ -17,4 +17,9 @@ urlpatterns = [
     # path('farmers/', views.farmers_list, name='farmers_list'),
     # path('farmers/<int:pk>/', views.farmer_detail, name='farmer_detail'),
     
+    # field manager
+    path("manager-dashboard/", views.manager_dashboard, name="manager_dashboard"),
+    path("pickup-locations/", views.pickup_locations, name="pickup_locations"),
+    path("milk-collections/", views.milk_collections_report, name="milk_collections_report"),
+    path("supervisions/", views.supervisions, name="supervisions"),
     ]

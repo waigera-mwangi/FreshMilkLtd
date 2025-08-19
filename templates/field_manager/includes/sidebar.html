@@ -1,92 +1,55 @@
-<aside id="sidebar" class="sidebar"  >
+<aside id="layout-menu" class="sidebar">
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
-   <li class="nav-item">
-<a href="{% url 'accounts:inventory_manager' %}">
-  <i class="bi bi-grid"></i>
-  <span>Dashboard</span>
-</a>
-</li><br><!-- End Dashboard Nav -->
-
-
-
-<li class="menu-item">
-<a href="{% url 'store:create_category' %}">
-  <i class="bi bi-folder-plus"></i>
-  Create Category
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'store:inventory_category_list' %}">
-  <i class="bi bi-list"></i>
-  Category List
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'store:product-create' %}">
-  <i class="bi bi-plus"></i>
-  Create Product
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'store:product-list' %}">
-  <i class="bi bi-box"></i>
-  Product List
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'supply:tender-request' %}">
-  <i class="bi bi-pencil"></i>
-  Add Supply Tender
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'supply:pending_approval_tenders' %}">
-  <i class="bi bi-hourglass-split"></i>Tenders Pending Approval
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'supply:confirm-tenders' %}">
-  <i class="bi bi-check-circle"></i>Supplies Pending Approval
-</a>
-</li><br>
-
-<li class="menu-item">
-<a href="{% url 'supply:confirmed-inventory-tenders' %}">
-  <i class="bi bi-check2-circle"></i>
-  Completed Supplies
-</a>
-</li><br>
-
-<li class="nav-item">
-<a class="nav-link collapsed" href="{% url 'feedback:inventory_send_feedback' %}">
-  <i class="fas fa-paper-plane"></i>
-  <span>Send Feedback</span>
-</a>
-</li>  
-
-<li class="nav-item">
-<a class="nav-link collapsed" href="{% url 'feedback:inventory_feedback' %}">
-  <i class="fas fa-comments"></i>
-  <span>Feedback</span>
-</a>
-</li>
-      
+    <!-- Dashboard -->
     <li class="nav-item">
-      <a class="nav-link collapsed" href="{% url 'feedback:inventory-faq' %}">
-        <i class="bi bi-question-circle"></i>
-        <span>F.A.Q</span>
+      <a class="nav-link" href="{% url 'deliveries:manager_dashboard' %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
       </a>
-    </li><!-- End F.A.Q Page Nav -->
+    </li>
 
+    <!-- Milk Collections -->
+    <li class="nav-item">
+      <a class="nav-link" href="*">
+        <i class="bi bi-bucket"></i>
+        <span>Milk Collections</span>
+      </a>
+    </li>
+
+    <!-- Farmers -->
+    <li class="nav-item">
+      <a class="nav-link" href="*">
+        <i class="bi bi-person-lines-fill"></i>
+        <span>Farmers</span>
+      </a>
+    </li>
+
+    <!-- Field Agents -->
+    <li class="nav-item">
+      <a class="nav-link" href="*">
+        <i class="bi bi-people"></i>
+        <span>Field Agents</span>
+      </a>
+    </li>
+
+    <!-- Supervision Logs -->
+    <li class="nav-item">
+      <a class="nav-link" href="*">
+        <i class="bi bi-journal-text"></i>
+        <span>Supervision Logs</span>
+      </a>
+    </li>
+
+    <!-- Reports -->
+    <li class="nav-item">
+      <a class="nav-link" href="*">
+        <i class="fas fa-chart-line"></i>
+        <span>Field Reports</span>
+      </a>
+    </li>
 
   </ul>
 
-</aside><!-- End Sidebar-->
+</aside><!-- End Sidebar -->
