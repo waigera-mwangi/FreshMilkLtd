@@ -389,21 +389,21 @@ def milk_collections_report(request):
     # Aggregate total milk per farmer
     farmer_report = (
         MilkCollection.objects.values("farmer__first_name", "farmer__last_name")
-        .annotate(total_quantity=Sum("quantity"))
+        .annotate(total_quantity=Sum("quantity_liters"))
         .order_by("-total_quantity")
     )
 
     # Aggregate per pickup location
     location_report = (
         MilkCollection.objects.values("pickup_location__name")
-        .annotate(total_quantity=Sum("quantity"))
+        .annotate(total_quantity=Sum("quantity_liters"))
         .order_by("-total_quantity")
     )
 
     # Aggregate per date (daily totals)
     daily_report = (
         MilkCollection.objects.values("collection_date")
-        .annotate(total_quantity=Sum("quantity"))
+        .annotate(total_quantity=Sum("quantity_liters"))
         .order_by("-collection_date")
     )
 
