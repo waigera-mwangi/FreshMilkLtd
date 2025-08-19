@@ -381,3 +381,35 @@ def farmer_detail(request, farmer_id):
         "farmer": farmer,
         "milk_collections": milk_collections
     })
+
+
+    @login_required
+@user_passes_test(is_field_manager)
+def milk_collections_report(request):
+    # Aggregate total milk per farmer
+    farmer_report = (
+        MilkCollection.objects.values("farmer__first_name", "farmer__last_name")
+        .annotate(total_quantity=Sum("quantity"))
+        .order_by("-total_quantity")
+    )
+
+    # Aggregate per pickup location
+    location_report = (
+        MilkCollection.objects.values("pickup_location__name")
+        .annotate(total_quantity=Sum("quantity"))
+        .order_by("-total_quantity")
+    )
+
+    # Aggregate per date (daily totals)
+    daily_report = (
+        MilkCollection.objects.values("collection_date")
+        .annotate(total_quantity=Sum("quantity"))
+        .order_by("-collection_date")
+    )
+
+    context = {
+        "farmer_report": farmer_report,
+        "location_report": location_report,
+        "daily_report": daily_report,
+    }
+    return render(request, "field_manager/pages/milk_collections_report.html", context)
